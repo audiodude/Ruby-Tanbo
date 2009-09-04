@@ -61,25 +61,30 @@ class MainController
     return nil if x < 0 || y < 0 || x > 18 || y > 18
     return nil unless blank?(x, y)
     
+    adjacent = false
     answer = nil
     if x-1 >= 0
       if @gameboard[x-1][y] == color
         answer = [x-1, y]
+        adjacent = true
       end
     end
     if y-1 >= 0
       if @gameboard[x][y-1] == color
-        answer = (answer ? nil : [x, y-1])
+        answer = (adjacent ? nil : [x, y-1])
+        adjacent = true
       end
     end
     if x+1 < 19
       if @gameboard[x+1][y] == color
-        answer = (answer ? nil : [x+1, y])
+        answer = (adjacent ? nil : [x+1, y])
+        adjacent = true
       end
     end
     if y+1 < 19
       if @gameboard[x][y+1] == color
-        answer = (answer ? nil : [x, y+1])
+        answer = (adjacent ? nil : [x, y+1])
+        adjacent = true
       end
     end
     

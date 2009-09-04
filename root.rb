@@ -38,10 +38,10 @@ class Root
   end
   
   def remove!
-    puts "Remove called for:"
-    pp @moves
-    pp @points
-    puts "="*10
+    #puts "Remove called for:"
+    #pp @moves
+    #pp @points
+    #puts "="*10
     for pt in @points
       @controller.remove(pt)
     end
