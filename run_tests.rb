@@ -1,0 +1,1 @@
+require 'test/ruby_tanbo_test.rb'

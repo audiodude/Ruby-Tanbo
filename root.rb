@@ -11,17 +11,15 @@ class Root
   end
   
   def edit_moves_for(point)
-    if MainController.in_bounds?(point)
-      if @controller.valid_move?(point, @color)
-        @moves << point
-      else
-        @moves.delete(point)
-      end
+    if @controller.valid_move?(point, @color)
+      @moves << point
+    else
+      @moves.delete(point)
     end
   end
   
   def calc_valid_moves(point)
-    MainController.neighbors(point).each do |pair|
+    MainController.bounded_neighbors(point).each do |pair|
       edit_moves_for(pair)
     end
   end
@@ -53,15 +51,18 @@ class Root
   def recalculate!
     seen = @points.dup
     dfs(@points[0], [])
+    @moves.uniq!
+    return @points
   end
   
   def dfs(node, visited)
     visited << node
     if(@controller.get_color(node) == @color)
+      @points << node
       calc_valid_moves(node)
     end
-    MainController.neighbors(node).each do |neighbor|
-      unless visited.include?(neighbor)
+    MainController.bounded_neighbors(node).each do |neighbor|
+      if (! visited.include?(neighbor)) and @controller.get_color(node) == @color
         dfs(neighbor, visited)
       end
     end
