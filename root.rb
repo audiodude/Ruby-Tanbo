@@ -1,4 +1,6 @@
 class Root
+  attr_reader :color
+
 
   def initialize(point, color, controller)
     @controller  = controller
