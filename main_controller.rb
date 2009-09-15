@@ -1,9 +1,15 @@
 require 'root.rb'
+require "observer"
+
 
 # The conroller, which stores the state of the game, calculates
 # valid moves, and calculates the effects of moves.
 class MainController
+  include Observable
 
+  BLACK_WINS_EVENT = -11
+  WHITE_WINS_EVENT = -22
+  
   WHITE = 1
   EMPTY = BLANK = 0
   BLACK = -1
@@ -39,6 +45,7 @@ class MainController
   # initialize, and is the appropriate method for "New game" functionality.
   def reset!
    @turn = BLACK
+   @roots_left = 16
 
     # The game board is  2D 19x19 array
     @gameboard = []
@@ -59,25 +66,42 @@ class MainController
     # A root is a group of pieces of the same color, connected
     # Each of the initial pieces represents a root, and roots are
     # never added to the game, only removed
-    @roots = { [6 , 0 ] => Root.new([6, 0], 1, self),
-               [18, 0 ] => Root.new([18, 0], 1, self),
-               [0 , 6 ] => Root.new([0, 6], 1, self),
-               [12, 6 ] => Root.new([12, 6], 1, self),
-               [6 , 12] => Root.new([6, 12], 1, self),
-               [18, 12] => Root.new([18, 12], 1, self),
-               [0 , 18] => Root.new([0, 18], 1, self),
-               [12, 18] => Root.new([12, 18], 1, self),
-
-               [0 , 0 ] => Root.new([0, 0], -1, self),
-               [12, 0 ] => Root.new([12, 0], -1, self),
-               [6 , 6 ] => Root.new([6, 6], -1, self),
-               [18, 6 ] => Root.new([18, 6], -1, self),
-               [12, 12] => Root.new([12, 12], -1, self),
-               [18, 18] => Root.new([18, 18], -1, self),
-               [6 , 18] => Root.new([6, 18], -1, self),
-               [0 , 12] => Root.new([0, 12], -1, self)
-             }
-    @debug_root = @roots[[0,6]]
+    # TODO : Need a better data structure...
+    @roots = [
+       Root.new([6 , 0 ],  1, self),
+       Root.new([18, 0 ],  1, self),
+       Root.new([0 , 6 ],  1, self),
+       Root.new([12, 6 ],  1, self),
+       Root.new([6 , 12],  1, self),
+       Root.new([18, 12],  1, self),
+       Root.new([0 , 18],  1, self),
+       Root.new([12, 18],  1, self),
+       Root.new([0 , 0 ], -1, self),
+       Root.new([12, 0 ], -1, self),
+       Root.new([6 , 6 ], -1, self),
+       Root.new([18, 6 ], -1, self),
+       Root.new([12, 12], -1, self),
+       Root.new([18, 18], -1, self),
+       Root.new([6 , 18], -1, self),
+       Root.new([0 , 12], -1, self)
+    ]
+    @pts_to_root = { [6 , 0 ] => @roots[0],
+       [18, 0 ] => @roots[1],
+       [0 , 6 ] => @roots[2],
+       [12, 6 ] => @roots[3],
+       [6 , 12] => @roots[4],
+       [18, 12] => @roots[5],
+       [0 , 18] => @roots[6],
+       [12, 18] => @roots[7],
+       [0 , 0 ] => @roots[8],
+       [12, 0 ] => @roots[9],
+       [6 , 6 ] => @roots[10],
+       [18, 6 ] => @roots[11],
+       [12, 12] => @roots[12],
+       [18, 18] => @roots[13],
+       [6 , 18] => @roots[14],
+       [0 , 12] => @roots[15],
+    }
   end
   
   def set_board(board)
@@ -96,8 +120,25 @@ class MainController
     end
   end
   
+  def get_all_moves(color=nil)
+    color = whose_turn? unless color
+    
+    ans = {}
+    0.upto(18) {|x|
+      0.upto(18) {|y|
+        test = valid_move?([x, y], color)
+        ans[[x, y]] = test if test
+      }
+    }
+    return ans
+  end
+  
   def whose_turn?
     return @turn
+  end
+  
+  def game_over?
+    @roots && (@roots.size == 1)
   end
   
   def blank?(point)
@@ -109,8 +150,11 @@ class MainController
   # currently has control of the board.
   #
   # Returns an array [x, y] of the board location of the piece that makes
-  # this a valid move, or nil if there is no such piece.
+  # this a valid move, or nil if there is no such piece. Always returns nil
+  # when the game is in the BLACK_WINS or WHITE_WINS state.
   def valid_move?(point, color=nil)
+    return nil if game_over?
+    
     x,y = point
     color = whose_turn? unless color
     
@@ -163,7 +207,13 @@ class MainController
   # After the piece is place, calculations are done to see if any roots have
   # become bounded. If so, roots are immediately removed according to the
   # games bounding rules.
+  #
+  # If the BLACK_WINS or WHITE_WINS state is in effect, this is a no op.
   def make_move(point, adj)
+    return if game_over?
+    debug unless point
+    raise ArgumentError, "nil value given for move" unless point
+    
     @modified = true
     #print point.inspect + ", "
     x,y = point
@@ -171,13 +221,15 @@ class MainController
     @gameboard[x][y] = @turn
     
     # Switch turn control
-    @turn = (@turn == -1 ? 1 : -1)
+    mover = @turn
+    @turn = (@turn == BLACK ? WHITE : BLACK)
     
     # Find the root that the newly placed piece is a part of
-    cur_root = @roots[adj]
+    cur_root = @pts_to_root[adj]
+    raise "Could not find root for pt: " + adj.inspect unless cur_root
     cur_root.add_point(point)
     #Make this board location hash to the root it's in
-    @roots[point] = cur_root 
+    @pts_to_root[point] = cur_root 
     other_bounded = []
     
     # Get the new piece's neighbor's neighbors. If they contain roots,
@@ -189,7 +241,7 @@ class MainController
       next if neighbor == adj || get_color(neighbor) != BLANK
       
       for next_neighbor in self.class.neighbors(neighbor)
-        next_root = @roots[next_neighbor]
+        next_root = @pts_to_root[next_neighbor]
         if next_root && next_root != cur_root && next_root.color == cur_root.color
           # There is a root next to one of the new pieces neighbors, and it is
           # the same color as the root of this piece. That neighbor, therefore,
@@ -200,12 +252,12 @@ class MainController
     end
     
     # Now check every root
-    for root in @roots.values
+    for root in @roots
       # The current move is no longer a valid liberty of any root
       root.remove_point(point)
       
       # If the root has become bounded, keep track of it.
-      if root.bounded?
+      if root.bounded? && root != cur_root
         other_bounded << root
       end
     end
@@ -224,6 +276,14 @@ class MainController
         end
       end
     end
+    
+    # There can be only one...
+    puts @roots.size
+    if @roots.size == 1
+      event = (@roots[0].color == WHITE ? WHITE_WINS_EVENT : BLACK_WINS_EVENT)
+      changed
+      notify_observers(event)
+    end
   end
   
   def remove!(point)
@@ -231,10 +291,19 @@ class MainController
     @gameboard[point[0]][point[1]] = 0
   end
   
+  def random_move
+    return if game_over?
+    
+    moves = get_all_moves
+    return if moves.empty? #I think there's a race condition somewhere with the auto-player
+    chosen = moves.keys[rand(moves.keys.size)]
+    make_move(chosen, moves[chosen])
+  end
+  
   def debug
     require 'pp'
     
-    @roots.values.uniq.each do |r|
+    @pts_to_root.values.uniq.each do |r|
       puts r.inspect
       puts "=========="
     end
@@ -242,7 +311,7 @@ class MainController
     puts "-"*10
     puts output_board
     puts "-"*10
-    pp @roots.keys
+    pp @pts_to_root.keys
     
     parse_board(output_board)
   end
@@ -325,47 +394,33 @@ class MainController
   end
   
   def reset_roots
-    @roots = {}
-                                       
-    next_root = @roots[[6 , 0 ]] = Root.new([6 , 0 ], 1 , self) if \
-                                                @gameboard[6 ][0 ] == 1   
-    next_root = @roots[[18, 0 ]] = Root.new([18, 0 ], 1 , self) if \
-                                                @gameboard[18][0 ] == 1   
-    next_root = @roots[[0 , 6 ]] = Root.new([0 , 6 ], 1 , self) if \
-                                                @gameboard[0 ][6 ] == 1   
-    next_root = @roots[[12, 6 ]] = Root.new([12, 6 ], 1 , self) if \
-                                                @gameboard[12][6 ] == 1   
-    next_root = @roots[[6 , 12]] = Root.new([6 , 12], 1 , self) if \
-                                                @gameboard[6 ][12] == 1   
-    next_root = @roots[[18, 12]] = Root.new([18, 12], 1 , self) if \
-                                                @gameboard[18][12] == 1   
-    next_root = @roots[[0 , 18]] = Root.new([0 , 18], 1 , self) if \
-                                                @gameboard[0 ][18] == 1   
-    next_root = @roots[[12, 18]] = Root.new([12, 18], 1 , self) if \
-                                                @gameboard[12][18] == 1   
-    next_root = @roots[[0 , 0 ]] = Root.new([0 , 0 ], -1, self) if \
-                                                @gameboard[0 ][0 ] == -1  
-    next_root = @roots[[12, 0 ]] = Root.new([12, 0 ], -1, self) if \
-                                                @gameboard[12][0 ] == -1  
-    next_root = @roots[[6 , 6 ]] = Root.new([6 , 6 ], -1, self) if \
-                                                @gameboard[6 ][6 ] == -1  
-    next_root = @roots[[18, 6 ]] = Root.new([18, 6 ], -1, self) if \
-                                                @gameboard[18][6 ] == -1  
-    next_root = @roots[[12, 12]] = Root.new([12, 12], -1, self) if \
-                                                @gameboard[12][12] == -1  
-    next_root = @roots[[18, 18]] = Root.new([18, 18], -1, self) if \
-                                                @gameboard[18][18] == -1  
-    next_root = @roots[[6 , 18]] = Root.new([6 , 18], -1, self) if \
-                                                @gameboard[6 ][18] == -1  
-    next_root = @roots[[0 , 12]] = Root.new([0 , 12], -1, self) if \
-                                                @gameboard[0 ][12] == -1
+    @pts_to_root = {}
+    
+    #Duddint work...
+    # @roots << (@pts_to_root[[6 , 0 ]] = Root.new([6 , 0 ], 1 , self)) if @gameboard[6 ][0 ] == 1 
+    # @roots << (@pts_to_root[[18, 0 ]] = Root.new([18, 0 ], 1 , self)) if @gameboard[18][0 ] == 1 
+    # @roots << (@pts_to_root[[0 , 6 ]] = Root.new([0 , 6 ], 1 , self)) if @gameboard[0 ][6 ] == 1 
+    # @roots << (@pts_to_root[[12, 6 ]] = Root.new([12, 6 ], 1 , self)) if @gameboard[12][6 ] == 1 
+    # @roots << (@pts_to_root[[6 , 12]] = Root.new([6 , 12], 1 , self)) if @gameboard[6 ][12] == 1 
+    # @roots << (@pts_to_root[[18, 12]] = Root.new([18, 12], 1 , self)) if @gameboard[18][12] == 1 
+    # @roots << (@pts_to_root[[0 , 18]] = Root.new([0 , 18], 1 , self)) if @gameboard[0 ][18] == 1 
+    # @roots << (@pts_to_root[[12, 18]] = Root.new([12, 18], 1 , self)) if @gameboard[12][18] == 1 
+    # @roots << (@pts_to_root[[0 , 0 ]] = Root.new([0 , 0 ], -1, self)) if @gameboard[0 ][0 ] == -1
+    # @roots << (@pts_to_root[[12, 0 ]] = Root.new([12, 0 ], -1, self)) if @gameboard[12][0 ] == -1
+    # @roots << (@pts_to_root[[6 , 6 ]] = Root.new([6 , 6 ], -1, self)) if @gameboard[6 ][6 ] == -1
+    # @roots << (@pts_to_root[[18, 6 ]] = Root.new([18, 6 ], -1, self)) if @gameboard[18][6 ] == -1
+    # @roots << (@pts_to_root[[12, 12]] = Root.new([12, 12], -1, self)) if @gameboard[12][12] == -1
+    # @roots << (@pts_to_root[[18, 18]] = Root.new([18, 18], -1, self)) if @gameboard[18][18] == -1
+    # @roots << (@pts_to_root[[6 , 18]] = Root.new([6 , 18], -1, self)) if @gameboard[6 ][18] == -1
+    # @roots << (@pts_to_root[[0 , 12]] = Root.new([0 , 12], -1, self)) if @gameboard[0 ][12] == -1
    
-    @roots.values.each do |r|
+    @roots_left = @pts_to_root.size
+   
+    @pts_to_root.values.each do |r|
       r.recalculate!.each do |point|
-        @roots[point] = r
+        @pts_to_root[point] = r
       end
     end
-    
-    end
+  end
 
 end

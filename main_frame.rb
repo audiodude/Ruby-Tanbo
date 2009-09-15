@@ -1,25 +1,38 @@
 require 'board_panel.rb'
 
 class MainFrame < Frame
-
+  
+  MSG_FONT = Font.new(26, FONTFAMILY_SWISS, FONTSTYLE_NORMAL, FONTWEIGHT_BOLD)
+  
   def initialize(controller)
     super(nil,  :title => "Tanbo", 
                 :pos => [100, 25],  
-                :size => [450, 500],
+                :size => [450, 640],
                 :style => DEFAULT_FRAME_STYLE | FULL_REPAINT_ON_RESIZE
     )
     
-    self.set_min_size([450,500])
+    controller.add_observer(self)
+    @timer = Wx::Timer.new(self)
+    evt_timer(@timer.id) {
+      controller.random_move
+      @board.do_paint
+    }
+    @timer.start(20)
+    
+    self.set_min_size([450,640])
     
     sizer = Wx::BoxSizer.new(VERTICAL)
-    set_sizer(sizer)
     
     @board = BoardPanel.new(self, controller)
-    sizer.add(@board, 4, SHAPED|ALL, 10)
+    sizer.add(@board, 40, SHAPED|LEFT|RIGHT|TOP|ALIGN_CENTER_HORIZONTAL, 10)
     
     button_sizer = BoxSizer.new(HORIZONTAL)
-    button_sizer.set_min_size(470,80)
-    sizer.add(button_sizer, 1, SHAPED|ALL, 10)
+    button_sizer.set_min_size(470, 60)
+    sizer.add(button_sizer, 4, SHAPED|LEFT|RIGHT|ALIGN_CENTER_HORIZONTAL, 10)
+    
+    @msg_area = StaticText.new(self, :label => "", :size => [200, 30], :style=>ALIGN_CENTRE)
+    sizer.add(@msg_area, 3, SHAPED|ALIGN_CENTER_HORIZONTAL|LEFT|RIGHT|BOTTOM, 10)
+    @msg_area.set_font(MSG_FONT)
     
     @new_button = Button.new(self, :label=>"New Game")
     button_sizer.add_stretch_spacer(1)
@@ -57,10 +70,10 @@ class MainFrame < Frame
     button_sizer.add_spacer(22)
     
     evt_button(@load_button.id) { |event|
-      if(controller.modified)
-        MessageDialog.new(self, "Would you like to save your current game before loading a new one?", 
-                          :style => NO_DEFAULT | ICON_QUESTION ).show_modal
-      end
+      # if(controller.modified)
+      #         MessageDialog.new(self, "Would you like to save your current game before loading a new one?", 
+      #                           :style => NO_DEFAULT | ICON_QUESTION ).show_modal
+      #       end
       
       picker = FileDialog.new(self, :style => FD_OPEN | FD_FILE_MUST_EXIST)
       picker.show_modal
@@ -84,11 +97,24 @@ class MainFrame < Frame
     
     evt_button(@about_button.id) { |event|
       controller.debug
+        controller.random_move
+        @board.do_paint
+        @timer.stop
     }
+    
+    set_sizer(sizer)
   end
   
   def set_controller(controller)
     @main_controller = controller
+  end
+  
+  def update(event)
+    if event == MainController::WHITE_WINS_EVENT
+      @msg_area.set_label("White wins!")
+    elsif event == MainController::BLACK_WINS_EVENT
+      @msg_area.set_label("Black wins!")
+    end
   end
   
 end

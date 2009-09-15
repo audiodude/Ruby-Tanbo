@@ -12,6 +12,7 @@ class MainApp < App
     main_frame = MainFrame.new(main_controller)
     main_frame.show
   end
+  
 end
  
 # Run the application

@@ -23,3 +23,4 @@ end
 require 'test/test_board.rb'
 require 'test/test_moves.rb'
 require 'test/test_roots.rb'
+require 'test/test_save_load.rb'
