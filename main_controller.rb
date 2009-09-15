@@ -215,6 +215,7 @@ class MainController
     raise ArgumentError, "nil value given for move" unless point
     
     @modified = true
+    
     #print point.inspect + ", "
     x,y = point
     # Set the give location to the current turn's color
