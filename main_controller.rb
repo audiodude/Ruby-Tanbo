@@ -12,6 +12,16 @@ class MainController
     x,y = point
     return [ [x+1, y], [x, y+1], [x-1, y], [x, y-1] ]
   end
+  
+  def self.in_bounds?(point)
+    x,y = point
+    return false if x < 0
+    return false if x > 18
+    return false if y < 0
+    return false if y > 18
+    
+    return true
+  end
 
   def initialize
     @turn = -1
@@ -67,7 +77,11 @@ class MainController
   end
   
   def get_color(point)
-    return @gameboard[point[0]][point[1]]
+    if self.class.in_bounds?(point)
+      @gameboard[point[0]][point[1]]
+    else
+      nil
+    end
   end
   
   def whose_turn?
@@ -138,8 +152,7 @@ class MainController
   # become bounded. If so, roots are immediately removed according to the
   # games bounding rules.
   def make_move(point, adj)
-    #require 'pp'
-    print point.inspect + ", "
+    #print point.inspect + ", "
     x,y = point
     # Set the give location to the current turn's color
     @gameboard[x][y] = @turn
@@ -153,6 +166,25 @@ class MainController
     #Make this board location hash to the root it's in
     @roots[point] = cur_root 
     other_bounded = []
+    
+    # Get the new piece's neighbor's neighbors. If they contain roots,
+    # let those roots recalculate if their liberties are still valid.
+    for neighbor in self.class.neighbors(point)
+      # Skip the neighbor that allowed us to place the piece, and any
+      # non-empty points. The status of filled points doesn't change
+      # by placing a piece.    
+      next if neighbor == adj || get_color(neighbor) != BLANK
+      
+      for next_neighbor in self.class.neighbors(neighbor)
+        next_root = @roots[next_neighbor]
+        if next_root && next_root != cur_root && next_root.color == cur_root.color
+          # There is a root next to one of the new pieces neighbors, and it is
+          # the same color as the root of this piece. That neighbor, therefore,
+          # is no longer a liberty for that root.
+          next_root.remove_point(neighbor)
+        end
+      end
+    end
     
     # Now check every root
     for root in @roots.values

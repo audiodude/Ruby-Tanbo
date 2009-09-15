@@ -403,8 +403,6 @@ class MainControllerTest < Test::Unit::TestCase
     ]
     do_move_sequence(seq)
 
-    @main_controller.debug
-
     assert_equal MainController::BLACK, @main_controller.whose_turn?, "Should be BLACK's turn after WHITE bounds two roots."
 
     point = [0, 0]

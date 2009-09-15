@@ -1,4 +1,6 @@
 class Root
+  attr_reader :color
+
 
   def initialize(point, color, controller)
     @controller  = controller
@@ -8,18 +10,8 @@ class Root
     calc_valid_moves(point)
   end
   
-  def in_bounds?(point)
-    x,y = point
-    return false if x < 0
-    return false if x > 18
-    return false if y < 0
-    return false if y > 18
-    
-    return true
-  end
-  
   def edit_moves_for(point)
-    if in_bounds?(point)
+    if MainController.in_bounds?(point)
       if @controller.valid_move?(point, @color)
         @moves << point
       else

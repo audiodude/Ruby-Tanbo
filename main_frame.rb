@@ -27,8 +27,8 @@ class MainFrame < Frame
     button_sizer.add_spacer(22)
     
     evt_button(@new_button.id) { |event|
-      controller.debug
-    } 	
+      controller.reset!
+    }
     
     @save_button = Button.new(self, :label=>"Save Game")
     button_sizer.add(@save_button, 0, FIXED_MINSIZE|ALIGN_CENTER, 20)
@@ -38,9 +38,13 @@ class MainFrame < Frame
     button_sizer.add(@load_button, 0, FIXED_MINSIZE|ALIGN_CENTER, 20)
     button_sizer.add_spacer(22)
     
-    @about_button = Button.new(self, :label=>"About")
+    @about_button = Button.new(self, :label=>"Debug")
     button_sizer.add(@about_button, 0, FIXED_MINSIZE|ALIGN_CENTER, 20)
     button_sizer.add_stretch_spacer(1)
+    
+    evt_button(@about_button.id) { |event|
+      controller.debug
+    }
   end
   
   def set_controller(controller)
