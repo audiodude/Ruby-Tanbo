@@ -1,15 +1,15 @@
-require 'pp'
-
 class Root
 
-  def initialize(x, y, color, controller)
+  def initialize(point, color, controller)
     @controller  = controller
-    @points = [ [x, y] ]
+    @points = [ point ]
     @color = color
-    @moves = neighbors(x, y)
+    @moves = []
+    calc_valid_moves(point)
   end
   
-  def in_bounds?(x, y)
+  def in_bounds?(point)
+    x,y = point
     return false if x < 0
     return false if x > 18
     return false if y < 0
@@ -18,37 +18,61 @@ class Root
     return true
   end
   
-  def neighbors(x, y)
-    ans = []
-    ans << [x+1, y] if in_bounds?(x+1, y) && @controller.valid_move?(x+1, y, @color)
-    ans << [x, y+1] if in_bounds?(x, y+1) && @controller.valid_move?(x, y+1, @color)
-    ans << [x-1, y] if in_bounds?(x-1, y) && @controller.valid_move?(x-1, y, @color)
-    ans << [x, y-1] if in_bounds?(x, y-1) && @controller.valid_move?(x, y-1, @color)
-    return ans
+  def edit_moves_for(point)
+    if in_bounds?(point)
+      if @controller.valid_move?(point, @color)
+        @moves << point
+      else
+        @moves.delete(point)
+      end
+    end
   end
   
-  def add_point(x, y)
-    @points << [x, y]
-    @moves.delete([x, y])
-    @moves += neighbors(x, y)
+  def calc_valid_moves(point)
+    MainController.neighbors(point).each do |pair|
+      edit_moves_for(pair)
+    end
   end
   
-  def remove_point(x, y)
-    @moves.delete([x,y])
+  def add_point(point)
+    @points << point
+    @moves.delete(point)
+    calc_valid_moves(point)
+  end
+  
+  def remove_point(point)
+    @moves.delete(point)
   end
   
   def remove!
-    #puts "Remove called for:"
-    #pp @moves
-    #pp @points
-    #puts "="*10
-    for pt in @points
-      @controller.remove(pt)
+    for point in @points
+      @controller.remove!(point)
     end
   end
   
   def bounded?
     @moves.empty?
+  end
+  
+  def inspect
+    @moves.inspect + "\n" + @points.inspect
+  end
+  
+  def recalculate!
+    seen = @points.dup
+    dfs(@points[0], [])
+  end
+  
+  def dfs(node, visited)
+    visited << node
+    if(@controller.get_color(node) == @color)
+      calc_valid_moves(node)
+    end
+    MainController.neighbors(node).each do |neighbor|
+      unless visited.include?(neighbor)
+        dfs(neighbor, visited)
+      end
+    end
   end
   
 end

@@ -3,10 +3,10 @@ class BoardPanel < Panel
   BG_PEN = Pen.new(Colour.new(232, 232, 160))
   
   def initialize(parent, controller)
-    super(parent, :size => [parent.get_client_size.get_width, parent.get_client_size.get_height/1.25])
+    super(parent, :size => [parent.get_client_size.get_width-20, parent.get_client_size.get_height/1.25])
     @controller = controller
     @controller.set_board(self)
-    evt_paint {|event|
+    evt_paint() {|event|
       do_paint
     }
     
@@ -19,7 +19,8 @@ class BoardPanel < Panel
     }
   end
   
-  def get_board_loc(x, y)
+  def get_board_loc(point)
+    x,y = point
     x_loc = x - get_origin[0]
     return nil if x_loc < 0 || x_loc > get_square_width*18
     x_loc = x_loc.to_f/get_square_width
@@ -46,7 +47,7 @@ class BoardPanel < Panel
       end
     end
     
-    return x_loc, y_loc
+    return [x_loc, y_loc]
   end
   
   def do_paint
@@ -65,7 +66,7 @@ class BoardPanel < Panel
     h = get_square_height
     x0, y0 = get_origin
   
-    if @last_hover && @controller.blank?(@last_hover[0], @last_hover[1])
+    if @last_hover && @controller.blank?(@last_hover)
       x, y = @last_hover
       paint { |dc|
         dc.set_brush(BG_BRUSH)
@@ -78,12 +79,12 @@ class BoardPanel < Panel
       }
     end
   
-    x_loc, y_loc = get_board_loc(event.get_x, event.get_y)
+    x_loc, y_loc = get_board_loc([event.get_x, event.get_y])
     return unless x_loc && y_loc
     
     @last_hover = [x_loc, y_loc]
     
-    if @controller.valid_move?(x_loc, y_loc)
+    if @controller.valid_move?(@last_hover)
       paint { |dc|
         dc.set_pen(BLACK_PEN)
         
@@ -100,26 +101,17 @@ class BoardPanel < Panel
   
   def do_click(event)
     black_turn = @controller.whose_turn? == -1
-    x_loc, y_loc = get_board_loc(event.get_x, event.get_y)
-    return unless x_loc && y_loc
-    move = @controller.valid_move?(x_loc, y_loc)
+    point = get_board_loc([event.get_x, event.get_y])
+    return unless point && point[0] && point[1]
+    move = @controller.valid_move?(point)
     if move
-      w = get_square_width
-      h = get_square_height
-      x0, y0 = get_origin
-      @controller.make_move(x_loc, y_loc, move)
+      @controller.make_move(point, move)
       
-      paint { |dc|
-        dc.set_pen(BLACK_PEN)
-        
-        if black_turn
-          dc.set_brush(BLACK_BRUSH)
-        else
-          dc.set_brush(BG_BRUSH)
-        end
-        
-        dc.draw_circle(x_loc*w + x0, y_loc*h + y0, w/3)
-      }
+      # Refresh the board after doing the move
+      do_paint
+      
+      # If the root got removed, try to hover over for the opposing player
+      do_hover(event)
     end
   end
   
