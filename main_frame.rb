@@ -3,6 +3,7 @@ require 'board_panel.rb'
 class MainFrame < Frame
   
   MSG_FONT = Font.new(26, FONTFAMILY_SWISS, FONTSTYLE_NORMAL, FONTWEIGHT_BOLD)
+  AUTOPLAY_INTERVAL = 0.020  #Interval to make auto moves, in seconds
   
   def initialize(controller)
     super(nil,  :title => "Tanbo", 
@@ -12,12 +13,12 @@ class MainFrame < Frame
     )
     
     controller.add_observer(self)
-    @timer = Wx::Timer.new(self)
-    evt_timer(@timer.id) {
+    @auto_move_timer = Wx::Timer.new(self)
+    evt_timer(@auto_move_timer.id) {
       controller.random_move
       @board.do_paint
     }
-    @timer.start(20)
+    @auto_move_timer.start((AUTOPLAY_INTERVAL*1000).to_i)
     
     self.set_min_size([450,640])
     
@@ -30,8 +31,8 @@ class MainFrame < Frame
     button_sizer.set_min_size(470, 60)
     sizer.add(button_sizer, 4, SHAPED|LEFT|RIGHT|ALIGN_CENTER_HORIZONTAL, 10)
     
-    @msg_area = StaticText.new(self, :label => "", :size => [200, 30], :style=>ALIGN_CENTRE)
-    sizer.add(@msg_area, 3, SHAPED|ALIGN_CENTER_HORIZONTAL|LEFT|RIGHT|BOTTOM, 10)
+    @msg_area = StaticText.new(self, :label => "", :size => [400, 30], :style=>ALIGN_CENTRE)
+    sizer.add(@msg_area, 3, SHAPED|ALIGN_CENTER|ALIGN_CENTER_HORIZONTAL|LEFT|RIGHT|BOTTOM, 10)
     @msg_area.set_font(MSG_FONT)
     
     @new_button = Button.new(self, :label=>"New Game")
@@ -70,6 +71,8 @@ class MainFrame < Frame
     button_sizer.add_spacer(22)
     
     evt_button(@load_button.id) { |event|
+      next # not working atm
+      
       # if(controller.modified)
       #         MessageDialog.new(self, "Would you like to save your current game before loading a new one?", 
       #                           :style => NO_DEFAULT | ICON_QUESTION ).show_modal
@@ -96,10 +99,15 @@ class MainFrame < Frame
     button_sizer.add_stretch_spacer(1)
     
     evt_button(@about_button.id) { |event|
+      # Output state info
       controller.debug
-        controller.random_move
-        @board.do_paint
-        @timer.stop
+      
+      # Toggle auto playing
+      if (not controller.game_over?) && @auto_move_timer.is_running
+        @auto_move_timer.stop
+      else
+        @auto_move_timer.start
+      end
     }
     
     set_sizer(sizer)
@@ -110,6 +118,9 @@ class MainFrame < Frame
   end
   
   def update(event)
+    #Game's over dude. Stop doing auto moves
+    @auto_move_timer.stop
+    
     if event == MainController::WHITE_WINS_EVENT
       @msg_area.set_label("White wins!")
     elsif event == MainController::BLACK_WINS_EVENT
