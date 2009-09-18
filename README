@@ -1,4 +1,12 @@
-Ruby Tanbo: An implementation of Mark Steere game Tanbo, using wx Ruby for the GUI
+Ruby Tanbo: An implementation of the Mark Steere game Tanbo, using Ruby and
+wxRuby for the GUI
+
+For more information on Tanbo, and the original rule set, see:
+http://www.marksteeregames.com/
+
+CHANGES:
+0.1b - Initial 'release'. A working game, playable by two people 'hot seat'
+style. Saving games works, but loading them doesn't. There is no AI yet.
 
 Author: Travis Briggs, briggs.travis (at) gmail.com
 ===================================================
