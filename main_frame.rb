@@ -18,7 +18,6 @@ class MainFrame < Frame
       controller.random_move
       @board.do_paint
     }
-    @auto_move_timer.start((AUTOPLAY_INTERVAL*1000).to_i)
     
     self.set_min_size([450,640])
     
@@ -106,7 +105,7 @@ class MainFrame < Frame
       if (not controller.game_over?) && @auto_move_timer.is_running
         @auto_move_timer.stop
       else
-        @auto_move_timer.start
+        @auto_move_timer.start((AUTOPLAY_INTERVAL*1000).to_i)
       end
     }
     

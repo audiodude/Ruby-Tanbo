@@ -48,9 +48,9 @@ class Root
     @moves.inspect + "\n" + @points.inspect
   end
   
-  def recalculate!
+  def recalculate!(visited)
     seen = @points.dup
-    dfs(@points[0], [])
+    dfs(@points[0], visited)
     @moves.uniq!
     return @points
   end

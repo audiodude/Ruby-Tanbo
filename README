@@ -5,8 +5,13 @@ For more information on Tanbo, and the original rule set, see:
 http://www.marksteeregames.com/
 
 CHANGES:
-0.1b - Initial 'release'. A working game, playable by two people 'hot seat'
-style. Saving games works, but loading them doesn't. There is no AI yet.
+
+0.1.1b (2009-09-19) - Turn off auto-playing by default. To toggle
+    auto-playing, use the debug button.
+
+0.1b   (2009-09-19)- Initial 'release'. A working game, playable by two people
+'hot seat' style. Saving games works, but loading them doesn't. There is no
+AI yet.
 
 Author: Travis Briggs, briggs.travis (at) gmail.com
 ===================================================

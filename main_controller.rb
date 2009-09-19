@@ -420,23 +420,21 @@ class MainController
   def reset_roots
     @pts_to_root = {}
     
-    #Duddint work...
-    # @roots << (@pts_to_root[[6 , 0 ]] = Root.new([6 , 0 ], 1 , self)) if @gameboard[6 ][0 ] == 1 
-    # @roots << (@pts_to_root[[18, 0 ]] = Root.new([18, 0 ], 1 , self)) if @gameboard[18][0 ] == 1 
-    # @roots << (@pts_to_root[[0 , 6 ]] = Root.new([0 , 6 ], 1 , self)) if @gameboard[0 ][6 ] == 1 
-    # @roots << (@pts_to_root[[12, 6 ]] = Root.new([12, 6 ], 1 , self)) if @gameboard[12][6 ] == 1 
-    # @roots << (@pts_to_root[[6 , 12]] = Root.new([6 , 12], 1 , self)) if @gameboard[6 ][12] == 1 
-    # @roots << (@pts_to_root[[18, 12]] = Root.new([18, 12], 1 , self)) if @gameboard[18][12] == 1 
-    # @roots << (@pts_to_root[[0 , 18]] = Root.new([0 , 18], 1 , self)) if @gameboard[0 ][18] == 1 
-    # @roots << (@pts_to_root[[12, 18]] = Root.new([12, 18], 1 , self)) if @gameboard[12][18] == 1 
-    # @roots << (@pts_to_root[[0 , 0 ]] = Root.new([0 , 0 ], -1, self)) if @gameboard[0 ][0 ] == -1
-    # @roots << (@pts_to_root[[12, 0 ]] = Root.new([12, 0 ], -1, self)) if @gameboard[12][0 ] == -1
-    # @roots << (@pts_to_root[[6 , 6 ]] = Root.new([6 , 6 ], -1, self)) if @gameboard[6 ][6 ] == -1
-    # @roots << (@pts_to_root[[18, 6 ]] = Root.new([18, 6 ], -1, self)) if @gameboard[18][6 ] == -1
-    # @roots << (@pts_to_root[[12, 12]] = Root.new([12, 12], -1, self)) if @gameboard[12][12] == -1
-    # @roots << (@pts_to_root[[18, 18]] = Root.new([18, 18], -1, self)) if @gameboard[18][18] == -1
-    # @roots << (@pts_to_root[[6 , 18]] = Root.new([6 , 18], -1, self)) if @gameboard[6 ][18] == -1
-    # @roots << (@pts_to_root[[0 , 12]] = Root.new([0 , 12], -1, self)) if @gameboard[0 ][12] == -1
+    visited = []
+    0.upto(@gameboard.size-1) do |x|
+      0.upto(@gameboard[x].size-1) do |y|
+        color = @gameboard[x][y]
+        visited << [x,y]
+        case color
+          when WHITE
+            
+          when BLACK
+            
+          when '.'
+            
+        end
+      end
+    end
    
     @pts_to_root.values.each do |r|
       r.recalculate!.each do |point|
