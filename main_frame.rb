@@ -51,7 +51,7 @@ class MainFrame < Frame
     evt_button(@save_button.id) { |event|
       picker = FileDialog.new(self, :style => FD_SAVE | FD_OVERWRITE_PROMPT)
       picker.set_filename("Tanbo_#{Time.new.strftime('%Y.%m.%d-%H.%M')}.tan")
-      picker.show_modal
+       next unless ID_YES == picker.show_modal
       begin
         save_file = File.new(picker.get_path, 'w')
         save_file.puts(controller.output_board)
@@ -70,24 +70,22 @@ class MainFrame < Frame
     button_sizer.add_spacer(22)
     
     evt_button(@load_button.id) { |event|
-     # next # not working atm
-      
-      # if(controller.modified)
-      #         MessageDialog.new(self, "If you load a game now, your current game will be lost. Abort game in progress?", 
-      #                           :style => NO_DEFAULT | ICON_QUESTION ).show_modal
-      #       end
-      
+      if(controller.modified)
+        # Return control, doing nothing, unless the user clicks YES
+        next unless ID_YES == MessageDialog.new(self,
+            "If you load a game now, your current game will be lost. Abort game in progress?", 
+            :style => YES_NO | NO_DEFAULT | ICON_QUESTION ).show_modal            
+      end
       picker = FileDialog.new(self, :style => FD_OPEN | FD_FILE_MUST_EXIST)
-      picker.show_modal
+      next unless ID_YES == picker.show_modal
       begin
         load_file = File.new(picker.get_path, 'r')
         controller.parse_board(load_file.read)
         @board.do_paint
       rescue SystemCallError, IOError=>e
-        unless ID_YES == MessageDialog.new(self, "The file you specified could not be opened", 
+        MessageDialog.new(self, "The file you specified could not be opened", 
                           :style => OK | ICON_EXCLAMATION ).show_modal
-          next
-        end
+        next
       ensure
         load_file.close if load_file
       end
