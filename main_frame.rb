@@ -153,7 +153,7 @@ class MainFrame < Frame
   def dirty_check
     return ID_YES == MessageDialog.new(self,
         "If you load a game now, your current game will be lost. Abort game in progress?", 
-        :style => YES_NO | NO_DEFAULT | ICON_QUESTION ).show_modal
+        :style => YES_NO | NO_DEFAULT | ICON_EXCLAMATION ).show_modal
   end
   
   def get_ai(choice, color)
