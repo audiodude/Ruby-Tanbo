@@ -4,6 +4,7 @@ require 'main_controller.rb'
 module RubyTanboTest 
   def setup
     @main_controller = MainController.new
+    # @main_controller.set_board(@main_controller.get_board.deep_copy)
   end
 
   # def teardown

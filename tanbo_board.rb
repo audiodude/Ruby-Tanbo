@@ -1,4 +1,6 @@
 class TanboBoard
+  attr_accessor :points, :turn
+  
   WHITE = 1
   EMPTY = BLANK = 0
   BLACK = -1
@@ -32,13 +34,21 @@ class TanboBoard
     def inspect
       "pt[#{x}, #{y}]"
     end
+    
+    def deep_copy(board)
+      copy = Point.new(@x, @y, board)
+      copy.color = @color
+      copy.root = @root.deep_copy(board) if @root
+      
+      return copy
+    end
   end
   
   def initialize
     @points = {}
   end
   
-  def [](x ,y)
+  def [](x, y)
     ans = @points[[x, y]]
     if not ans
       ans = Point.new(x, y, self)
@@ -46,6 +56,10 @@ class TanboBoard
       #puts "#Created " + ans.inspect + " #{ans.color}"
     end
     return ans
+  end
+  
+  def change_turns
+   @turn = (@turn == BLACK ? WHITE : BLACK)
   end
   
   def neighbors(point)
@@ -80,4 +94,15 @@ class TanboBoard
     end
   end
   
+  def deep_copy
+    copy = TanboBoard.new
+    copy.points = {}
+    @points.each do |k, v|
+      # Put a copy of each point, deep_copylicated using the new board, at all of the
+      # used indices
+      copy.points[k] = v.deep_copy(copy)
+    end
+    
+    return copy
+  end
 end

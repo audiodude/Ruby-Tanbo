@@ -189,4 +189,23 @@ class BoardTest < Test::Unit::TestCase
     end
   end
   
+  def test_deep_copy
+    orig_board = @main_controller.get_board
+    copy_board = orig_board.deep_copy
+    
+    orig_point = @main_controller.get_board[5, 12]
+    copy_point = copy_board[5, 12]
+    
+    assert !(orig_point.object_id == copy_point.object_id), "Copied points should not have same object_id"
+    assert (orig_point.color == copy_point.color), "Color should be the same for copied points"
+    assert (orig_point.root == copy_point.root), "Should have same (null) root"
+    
+    orig_point = @main_controller.get_board[0, 12]
+    copy_point = copy_board[0, 12]
+    
+    assert !(orig_point.object_id == copy_point.object_id), "Copied points should not have same object_id"
+    assert (orig_point.color == copy_point.color), "Color should be the same for copied points"
+    assert !(orig_point.root == copy_point.root), "Copied points should have unique roots"
+  end
+  
 end

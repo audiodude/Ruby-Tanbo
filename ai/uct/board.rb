@@ -2,7 +2,7 @@
 # http://github.com/joelthelion/uct
 
 module UCT
-  class AIBoard
+  class AIBoard < TanboBoard
 
     attr_accessor :width, :height, :win_length, :played_count
     attr_accessor :lastmove, :tokens, :token_count
@@ -22,7 +22,7 @@ module UCT
     	end
     end
 
-    def dup
+    def deep_copy
       copy = AIBoard.new(@width, @height, @win_length)
 
       #copy last move and played_count
@@ -30,9 +30,9 @@ module UCT
       copy.played_count = @played_count
     
       copy.tokens = Array.new(@width) do |column|
-    	  @tokens[column].dup
+    	  @tokens[column].deep_copy
     	end
-      copy.token_count = @token_count.dup
+      copy.token_count = @token_count.deep_copy
     
       return copy
     end

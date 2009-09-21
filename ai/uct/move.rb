@@ -9,7 +9,7 @@ module UCT
   	  @player, @column = player, column
   	end
 
-  	def dup
+  	def deep_copy
   	  copy = Move.new(@player, @column)
     	return copy
   	end

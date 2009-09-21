@@ -14,7 +14,7 @@ class RootTest < Test::Unit::TestCase
     do_move_sequence(seq)
     
     assert_equal TanboBoard::WHITE, @main_controller.whose_turn?, "Should be WHITE's turn after BLACK bounds WHITE root."
-    assert_equal TanboBoard::BLANK, @main_controller.get_color(@main_controller.get_board[0, 6]), "Square containg removed root should be BLANK."
+    assert_equal TanboBoard::BLANK, @main_controller.get_color(@main_controller.get_board[0, 6]), "Square containing removed root should be BLANK."
     
     black_points = [
       @main_controller.get_board[5, 6], @main_controller.get_board[4, 6], @main_controller.get_board[3, 6], @main_controller.get_board[2, 6], @main_controller.get_board[1, 6], @main_controller.get_board[1, 5], @main_controller.get_board[0, 5], @main_controller.get_board[1, 7], @main_controller.get_board[0, 7]  
@@ -44,9 +44,9 @@ class RootTest < Test::Unit::TestCase
     assert_equal TanboBoard::WHITE, @main_controller.whose_turn?, "Should be WHITE's turn after BLACK bounds WHITE root."
 
     point = @main_controller.get_board[0, 6]
-    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containg removed root pieces should be BLANK at: " + point.inspect
+    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containing removed root pieces should be BLANK at: " + point.inspect
     point = @main_controller.get_board[0, 5]
-    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containg removed root pieces should be BLANK at: " + point.inspect
+    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containing removed root pieces should be BLANK at: " + point.inspect
     
     black_points = [
       @main_controller.get_board[5, 6], @main_controller.get_board[4, 6], @main_controller.get_board[3, 6], @main_controller.get_board[2, 6], @main_controller.get_board[1, 6], @main_controller.get_board[1, 7], @main_controller.get_board[0, 7], @main_controller.get_board[1, 5], @main_controller.get_board[1, 4], @main_controller.get_board[0, 4] 
@@ -76,7 +76,7 @@ class RootTest < Test::Unit::TestCase
     assert_equal TanboBoard::BLACK, @main_controller.whose_turn?, "Should be BLACK's turn after WHITE bounds BLACK root."
 
     point = @main_controller.get_board[0, 12]
-    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containg removed root pieces should be BLANK at: " + point.inspect
+    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containing removed root pieces should be BLANK at: " + point.inspect
 
     black_points = [
       @main_controller.get_board[5, 6], @main_controller.get_board[4, 6], @main_controller.get_board[3, 6], @main_controller.get_board[11, 0], @main_controller.get_board[1, 0], @main_controller.get_board[5, 18], @main_controller.get_board[11, 12], @main_controller.get_board[17, 18], @main_controller.get_board[17, 6] 
@@ -107,11 +107,11 @@ class RootTest < Test::Unit::TestCase
     assert_equal TanboBoard::BLACK, @main_controller.whose_turn?, "Should be BLACK's turn after WHITE bounds itself."
 
     point = @main_controller.get_board[0, 6]
-    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containg removed root pieces should be BLANK at: " + point.inspect
+    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containing removed root pieces should be BLANK at: " + point.inspect
     point = @main_controller.get_board[0, 7]
-    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containg removed root pieces should be BLANK at: " + point.inspect
+    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containing removed root pieces should be BLANK at: " + point.inspect
     point = @main_controller.get_board[0, 8]
-    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containg removed root pieces should be BLANK at: " + point.inspect
+    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containing removed root pieces should be BLANK at: " + point.inspect
 
     black_points = [
       @main_controller.get_board[5, 6], @main_controller.get_board[4, 6], @main_controller.get_board[3, 6], @main_controller.get_board[2, 6], @main_controller.get_board[1, 6], @main_controller.get_board[1, 5], @main_controller.get_board[0, 5], @main_controller.get_board[1, 7], @main_controller.get_board[1, 8], @main_controller.get_board[1, 9], @main_controller.get_board[0, 9], @main_controller.get_board[2, 8]
@@ -141,13 +141,13 @@ class RootTest < Test::Unit::TestCase
     assert_equal TanboBoard::WHITE, @main_controller.whose_turn?, "Should be WHITE's turn after BLACK bounds WHITE root."
 
     point = @main_controller.get_board[0, 6]
-    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containg removed root pieces should be BLANK at: " + point.inspect
+    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containing removed root pieces should be BLANK at: " + point.inspect
     point = @main_controller.get_board[1, 6]
-    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containg removed root pieces should be BLANK at: " + point.inspect
+    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containing removed root pieces should be BLANK at: " + point.inspect
     point = @main_controller.get_board[1, 5]
-    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containg removed root pieces should be BLANK at: " + point.inspect
+    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containing removed root pieces should be BLANK at: " + point.inspect
     point = @main_controller.get_board[0, 7]
-    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containg removed root pieces should be BLANK at: " + point.inspect
+    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containing removed root pieces should be BLANK at: " + point.inspect
 
     black_points = [
       @main_controller.get_board[5, 6], @main_controller.get_board[4, 6], @main_controller.get_board[3, 6], @main_controller.get_board[2, 6], @main_controller.get_board[2, 5], @main_controller.get_board[2, 4], @main_controller.get_board[2, 7], @main_controller.get_board[2, 8], @main_controller.get_board[1, 8], @main_controller.get_board[0, 8], @main_controller.get_board[1, 4]
@@ -178,15 +178,15 @@ class RootTest < Test::Unit::TestCase
     assert_equal TanboBoard::BLACK, @main_controller.whose_turn?, "Should be BLACK's turn after WHITE bounds itself."
 
     point = @main_controller.get_board[0, 6]
-    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containg removed root pieces should be BLANK at: " + point.inspect
+    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containing removed root pieces should be BLANK at: " + point.inspect
     point = @main_controller.get_board[1, 6]
-    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containg removed root pieces should be BLANK at: " + point.inspect
+    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containing removed root pieces should be BLANK at: " + point.inspect
     point = @main_controller.get_board[1, 7]
-    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containg removed root pieces should be BLANK at: " + point.inspect
+    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containing removed root pieces should be BLANK at: " + point.inspect
     point = @main_controller.get_board[1, 8]
-    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containg removed root pieces should be BLANK at: " + point.inspect
+    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containing removed root pieces should be BLANK at: " + point.inspect
     point = @main_controller.get_board[0, 8]
-    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containg removed root pieces should be BLANK at: " + point.inspect
+    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containing removed root pieces should be BLANK at: " + point.inspect
 
     black_points = [
       @main_controller.get_board[5, 6], @main_controller.get_board[4, 6], @main_controller.get_board[3, 6], @main_controller.get_board[2, 6], @main_controller.get_board[2, 5], @main_controller.get_board[1, 5], @main_controller.get_board[0, 5], @main_controller.get_board[2, 7], @main_controller.get_board[2, 8], @main_controller.get_board[2, 9], @main_controller.get_board[1, 9], @main_controller.get_board[0, 9]
@@ -216,19 +216,19 @@ class RootTest < Test::Unit::TestCase
     assert_equal TanboBoard::BLACK, @main_controller.whose_turn?, "Should be BLACK's turn after WHITE bounds two roots."
 
     point = @main_controller.get_board[0, 0]
-    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containg removed root pieces should be BLANK at: " + point.inspect
+    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containing removed root pieces should be BLANK at: " + point.inspect
     point = @main_controller.get_board[1, 0]
-    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containg removed root pieces should be BLANK at: " + point.inspect
+    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containing removed root pieces should be BLANK at: " + point.inspect
     point = @main_controller.get_board[2, 0]
-    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containg removed root pieces should be BLANK at: " + point.inspect
+    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containing removed root pieces should be BLANK at: " + point.inspect
     point = @main_controller.get_board[3, 0]
-    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containg removed root pieces should be BLANK at: " + point.inspect
+    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containing removed root pieces should be BLANK at: " + point.inspect
     point = @main_controller.get_board[4, 0]
-    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containg removed root pieces should be BLANK at: " + point.inspect
+    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containing removed root pieces should be BLANK at: " + point.inspect
     point = @main_controller.get_board[5, 0]
-    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containg removed root pieces should be BLANK at: " + point.inspect
+    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containing removed root pieces should be BLANK at: " + point.inspect
     point = @main_controller.get_board[6, 0]
-    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containg removed root pieces should be BLANK at: " + point.inspect
+    assert_equal TanboBoard::BLANK, @main_controller.get_color(point), "Squares containing removed root pieces should be BLANK at: " + point.inspect
 
     black_points = [
      @main_controller.get_board[6, 5], @main_controller.get_board[6, 4], @main_controller.get_board[6, 3], @main_controller.get_board[6, 2], @main_controller.get_board[6, 1], @main_controller.get_board[7, 1], @main_controller.get_board[7, 0], @main_controller.get_board[5, 1], @main_controller.get_board[4, 1]

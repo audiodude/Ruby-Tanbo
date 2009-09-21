@@ -28,7 +28,7 @@ class AIUCT
     k = 0
     start_time = end_time = Time.now.to_f
 	  while ((!@max_iteration || k < @max_iteration) && @root.mode == UCT::Node::NORMAL && end_time - start_time < @max_sec)
-      copy = board.dup
+      copy = board.deep_copy
       winner = @root.play_random_game(copy, @player)
       k += 1
       end_time = Time.now.to_f
@@ -67,7 +67,7 @@ class AIUCT
     puts @root.print_tree if $DEBUG_OUT
 
 
-  	copy = move.dup
+  	copy = move.deep_copy
   	return copy
   end
 end

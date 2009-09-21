@@ -22,10 +22,10 @@ class MainController
   # Set up the game board and game conditions. This method is called from
   # initialize, and is the appropriate method for "New game" functionality.
   def reset!
-    @turn = TanboBoard::BLACK
-
     # The game board is a 19x19 2D grid of intersections (a Go board)
     @gameboard = TanboBoard.new
+
+    @gameboard.turn = TanboBoard::BLACK
 
     # A root is a group of pieces of the same color, connected
     # Each of the initial pieces represents a root, and roots are
@@ -81,6 +81,10 @@ class MainController
     }
   end
   
+  def set_board(board)
+    @gameboard = board
+  end
+  
   def get_board
     @gameboard
   end
@@ -120,7 +124,7 @@ class MainController
   ## End convenience auto-play code
   
   def whose_turn?
-    return @turn
+    @gameboard.turn
   end
   
   # If the game is not over, return nil
@@ -269,11 +273,11 @@ class MainController
     end
     
     # Set the give location to the current turn's color
-    point.color = @turn
+    point.color = @gameboard.turn
     
     # Switch turn control
-    mover = @turn
-    @turn = (@turn == TanboBoard::BLACK ? TanboBoard::WHITE : TanboBoard::BLACK)
+    mover = @gameboard.turn
+    @gameboard.change_turns
     
     # Add the point to the root, which causes the root's "valid moves" to be
     # recalculated
@@ -388,7 +392,7 @@ class MainController
       end
       ans += "\n"
     end
-    ans += (@turn == TanboBoard::WHITE ? "WHITE" : "BLACK")
+    ans += (@gameboard.turn == TanboBoard::WHITE ? "WHITE" : "BLACK")
     ans += "\n"
     return ans
   end
@@ -419,9 +423,9 @@ class MainController
     end
     
     if(chars.shift == "WHITE")
-      @turn = TanboBoard::WHITE
+      @gameboard.turn = TanboBoard::WHITE
     else
-      @turn = TanboBoard::BLACK
+      @gameboard.turn = TanboBoard::BLACK
     end
     
     create_roots

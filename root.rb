@@ -22,4 +22,25 @@ class Root
     "root{" + @liberties.inspect + "-" + @points.inspect + "}"
   end
   
+  def deep_copy(board)
+    copy = Root.new(@color)
+    copy.points = points.dup
+    copy.liberties = liberties.dup
+    copy.associate_with(board)
+    
+    return copy
+  end
+  
+  # Replaces the points and liberties in this root with ones
+  # representing the same point, but sourced from the given board.
+  # Used for object copying
+  def associate_with(board)
+    @points.map do |point|
+      board[point.x, point.y]
+    end
+    
+    @liberties.map do |point|
+      board[point.x, point.y]
+    end
+  end
 end
