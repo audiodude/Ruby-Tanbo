@@ -73,7 +73,7 @@ class MainFrame < Frame
       next # not working atm
       
       # if(controller.modified)
-      #         MessageDialog.new(self, "Would you like to save your current game before loading a new one?", 
+      #         MessageDialog.new(self, "If you load a game now, your current game will be lost. Abort game in progress?", 
       #                           :style => NO_DEFAULT | ICON_QUESTION ).show_modal
       #       end
       
@@ -120,9 +120,9 @@ class MainFrame < Frame
     #Game's over dude. Stop doing auto moves
     @auto_move_timer.stop
     
-    if event == TanboBoard::WHITE_WINS_EVENT
+    if event == MainController::WHITE_WINS_EVENT
       @msg_area.set_label("White wins!")
-    elsif event == TanboBoard::BLACK_WINS_EVENT
+    elsif event == MainController::BLACK_WINS_EVENT
       @msg_area.set_label("Black wins!")
     end
   end

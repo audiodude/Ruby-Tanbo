@@ -80,8 +80,9 @@ class MainController
     ans = {}
     0.upto(18) {|x|
       0.upto(18) {|y|
-        test = valid_move?(@gameboard[x, y], color)
-        ans[[x, y]] = test if test
+        next_point = @gameboard[x, y]
+        adj_point = valid_move?(next_point, color)
+        ans[next_point] = adj_point if adj_point
       }
     }
     return ans
@@ -349,14 +350,14 @@ class MainController
   # w.....b.....w......
   def output_board
     ans = ''
-    0.upto(@gameboard.size-1) do |x|
-      0.upto(@gameboard[x].size-1) do |y|
-        case @gameboard[y][x]
-          when 1
+    0.upto(18) do |x|
+      0.upto(18) do |y|
+        case @gameboard[y, x].color
+          when TanboBoard::WHITE
             ans += 'w'
-          when -1
+          when TanboBoard::BLACK
             ans += 'b'
-          when
+          when TanboBoard::BLANK
             ans += '.'
         end
       end
@@ -371,6 +372,7 @@ class MainController
   # of the game board accordingly
   def parse_board(str)
     return unless str
+    reset!
     
     chars = str.split(/\n/).collect { |line|
       line.scan(/WHITE|BLACK|./m)
@@ -386,11 +388,11 @@ class MainController
         c = chars.shift
         case c
           when 'w'
-            @gameboard[y][x] = 1
+            @gameboard[y, x] = TanboBoard::WHITE
           when 'b'
-            @gameboard[y][x] = -1
+            @gameboard[y, x] = TanboBoard::BLACK
           when '.'
-            @gameboard[y][x] = 0
+            @gameboard[y, x] = TanboBoard::BLANK
         end
       end
     end
@@ -401,54 +403,40 @@ class MainController
       @turn = TanboBoard::BLACK
     end
     
-    reset_roots
+    create_roots
   end
   
-  def reset_roots
-    # @pts_to_root = {}
-    #  
-    #  visited = []
-    #  0.upto(@gameboard.size-1) do |x|
-    #    0.upto(@gameboard[x].size-1) do |y|
-    #      color = @gameboard[x][y]
-    #      # Skip this square if it's already been visited
-    #      next if visited[[x, y]]
-    #      visited << [x,y]
-    #      # Mark as visited, but skip if its empty
-    #      next if color == TanboBoard::BLANK
-    #      
-    #      # Create a new root for this square and add it to @pts_to_root and @roots
-    #      new_root = Root.new([x, y], color, self))
-    #      new_root.recalculate!
-    #      @roots << (@pts_to_root[[x, y]] = 
-    #    end
-    #  end
-    # 
-    #  @pts_to_root.values.each do |r|
-    #    r.recalculate!.each do |point|
-    #      @pts_to_root[point] = r
-    #    end
-    #  end
+  def create_roots
+    visited = []
+    0.upto(@gameboard.size-1) do |x|
+      0.upto(@gameboard[x].size-1) do |y|
+        point = @gameboard[x, y]
+        # Skip this square if it's already been visited by one of the dfs runs
+        next if visited[point]
+        
+        # Mark as visited, but skip if its empty
+        if point.color == TanboBoard::BLANK
+          visited << point
+        end
+        
+        # Create a new root for this square and add it to @pts_to_root and @roots
+        # The point is marked as visited in this method
+        dfs_add_to_root(point, Root.new(point.color), visited)
+      end
+    end
   end
   
-  # def recalculate!(visited)
-  #   seen = @points.dup
-  #   dfs(@points[0], visited)
-  #   @moves.uniq!
-  #   return @points
-  # end
-  # 
-  # def dfs(node, visited)
-  #   visited << node
-  #   if(@controller.get_color(node) == @color)
-  #     @points << node
-  #     calc_valid_moves(node)
-  #   end
-  #   MainController.bounded_neighbors(node).each do |neighbor|
-  #     if (! visited.include?(neighbor)) and @controller.get_color(node) == @color
-  #       dfs(neighbor, visited)
-  #     end
-  #   end
-  # end
+  # Add
+  def dfs_add_to_root(point, root, visited)
+    visited << point
+    if(@controller.get_color(point) == root.color)
+      add_point_to_root(point, root)
+    end
+    MainController.bounded_neighbors(node).each do |neighbor|
+      if (! visited.include?(neighbor)) and node.color == root.color
+        dfs_add_to_root(point, root, visited)
+      end
+    end
+  end
 
 end

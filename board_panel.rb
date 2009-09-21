@@ -47,7 +47,7 @@ class BoardPanel < Panel
       end
     end
     
-    return [x_loc, y_loc]
+    return @controller.get_board[x_loc, y_loc]
   end
   
   def do_paint
@@ -66,7 +66,7 @@ class BoardPanel < Panel
     h = get_square_height
     x0, y0 = get_origin
   
-    if @last_hover && @controller.blank?(@last_hover)
+    if @last_hover && @controller.blank?(@controller.get_board[@last_hover[0], @last_hover[1]])
       x, y = @last_hover
       paint { |dc|
         dc.set_brush(BG_BRUSH)
@@ -79,12 +79,13 @@ class BoardPanel < Panel
       }
     end
   
-    x_loc, y_loc = get_board_loc([event.get_x, event.get_y])
-    return unless x_loc && y_loc
+    hover_loc = get_board_loc([event.get_x, event.get_y])
+    return unless hover_loc
     
+    x_loc, y_loc = hover_loc.x, hover_loc.y
     @last_hover = [x_loc, y_loc]
     
-    if @controller.valid_move?(@last_hover)
+    if @controller.valid_move?(hover_loc)
       paint { |dc|
         dc.set_pen(BLACK_PEN)
         
@@ -102,7 +103,7 @@ class BoardPanel < Panel
   def do_click(event)
     black_turn = @controller.whose_turn? == -1
     point = get_board_loc([event.get_x, event.get_y])
-    return unless point && point[0] && point[1]
+    return unless point
     move = @controller.valid_move?(point)
     if move
       @controller.make_move(point, move)
@@ -159,12 +160,14 @@ class BoardPanel < Panel
     board = @controller.get_board
     0.upto 18 do |x|
       0.upto 18 do |y|
-        c = board[x][y]
-        if c != 0
-          if c == -1
+        c = board[x, y].color
+        if c != TanboBoard::BLANK
+          if c == TanboBoard::BLACK
             dc.set_brush(BLACK_BRUSH)
-          else
+          elsif c == TanboBoard::WHITE
             dc.set_brush(BG_BRUSH)
+          else
+            raise "Point: " + board[x, y] + " was unrecognized color: " + c
           end
           dc.draw_circle(x*w + x0, y*h + y0, w/3)
         end
