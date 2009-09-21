@@ -1,3 +1,4 @@
+require 'main_controller.rb'
 require 'monitor.rb'
 
 class BoardPanel < Panel

@@ -386,7 +386,7 @@ class AIBoard
   	end
   	ans += "+\n"
 
-    0.upto(@height-1) do |row|
+    (@height-1).downto(0) do |row|
       ans += row.to_s + "|"
       0.upto(@width-1) do |column|
         case @tokens[column][row]
@@ -589,7 +589,7 @@ def play_game(player_a, player_b, board, max_move=nil)
 
   k = 0
 	while ( !max_move || k < max_move)
-		puts board.inspect if $DEBUG_OUT
+		puts board.inspect
 		
 		puts "getting move..." if $DEBUG_OUT
 
@@ -624,7 +624,27 @@ def play_game(player_a, player_b, board, max_move=nil)
 	return winner
 end
 
-board = AIBoard.new()
-player_a = AIUCT.new("Alice", Node::PLAYER_1, 1, 100)
-player_b = AIUCT.new("Bob", Node::PLAYER_2, 3, 100);
-play_game(player_a, player_b, board)
+class HumanPlayer
+  attr_reader :name, :player
+  
+  def initialize(name, player)
+    @name, @player = name, player
+  end
+  
+  def move(board, last_move)
+    puts "Your move..."
+    n = STDIN.gets.chomp!.to_i
+    Move.new(@player, n)
+  end
+  
+  def inspect
+    "Human (#{@name})"
+  end
+end
+
+# board = AIBoard.new()
+# player_a = AIUCT.new("Alice", Node::PLAYER_1, 1, 100)
+# player_b = HumanPlayer.new("T-$", Node::PLAYER_2)
+# 
+# $DEBUG_OUT = true
+# play_game(player_a, player_b, board)
