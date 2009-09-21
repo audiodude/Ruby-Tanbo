@@ -58,10 +58,6 @@ class MainController
     end
   end
   
-  def set_board(board)
-    @board = board
-  end
-  
   def get_board
     @gameboard
   end
@@ -372,27 +368,23 @@ class MainController
   # of the game board accordingly
   def parse_board(str)
     return unless str
-    reset!
+    @gameboard = TanboBoard.new
+    @roots = []
     
     chars = str.split(/\n/).collect { |line|
       line.scan(/WHITE|BLACK|./m)
     }.flatten
     
-    @gameboard = []
-    19.times do
-      @gameboard << Array.new(19, 0)
-    end
-    
-    0.upto(@gameboard.size-1) do |x|
-      0.upto(@gameboard[x].size-1) do |y|
+    0.upto(18) do |x|
+      0.upto(18) do |y|
         c = chars.shift
         case c
           when 'w'
-            @gameboard[y, x] = TanboBoard::WHITE
+            @gameboard[y, x].color = TanboBoard::WHITE
           when 'b'
-            @gameboard[y, x] = TanboBoard::BLACK
+            @gameboard[y, x].color = TanboBoard::BLACK
           when '.'
-            @gameboard[y, x] = TanboBoard::BLANK
+            @gameboard[y, x].color = TanboBoard::BLANK
         end
       end
     end
@@ -407,34 +399,37 @@ class MainController
   end
   
   def create_roots
-    visited = []
-    0.upto(@gameboard.size-1) do |x|
-      0.upto(@gameboard[x].size-1) do |y|
+    visited = {}
+    0.upto(18) do |x|
+      0.upto(18) do |y|
         point = @gameboard[x, y]
         # Skip this square if it's already been visited by one of the dfs runs
         next if visited[point]
         
         # Mark as visited, but skip if its empty
         if point.color == TanboBoard::BLANK
-          visited << point
+          visited[point] = true
+          next
         end
         
         # Create a new root for this square and add it to @pts_to_root and @roots
         # The point is marked as visited in this method
-        dfs_add_to_root(point, Root.new(point.color), visited)
+        new_root = Root.new(point.color)
+        @roots << new_root
+        dfs_add_to_root(point, new_root, visited)
       end
     end
   end
   
   # Add
   def dfs_add_to_root(point, root, visited)
-    visited << point
-    if(@controller.get_color(point) == root.color)
+    visited[point] = true
+    if(point.color == root.color)
       add_point_to_root(point, root)
     end
-    MainController.bounded_neighbors(node).each do |neighbor|
-      if (! visited.include?(neighbor)) and node.color == root.color
-        dfs_add_to_root(point, root, visited)
+    point.bounded_neighbors.each do |neighbor|
+      if (! visited.include?(neighbor)) and neighbor.color == root.color
+        dfs_add_to_root(neighbor, root, visited)
       end
     end
   end

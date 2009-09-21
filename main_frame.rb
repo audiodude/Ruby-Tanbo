@@ -70,7 +70,7 @@ class MainFrame < Frame
     button_sizer.add_spacer(22)
     
     evt_button(@load_button.id) { |event|
-      next # not working atm
+     # next # not working atm
       
       # if(controller.modified)
       #         MessageDialog.new(self, "If you load a game now, your current game will be lost. Abort game in progress?", 

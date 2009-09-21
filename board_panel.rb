@@ -5,7 +5,6 @@ class BoardPanel < Panel
   def initialize(parent, controller)
     super(parent, :size => [parent.get_client_size.get_width-20, parent.get_client_size.get_height/1.25])
     @controller = controller
-    @controller.set_board(self)
     evt_paint() {|event|
       do_paint
     }
