@@ -1,4 +1,5 @@
 require 'root.rb'
+require 'tanbo_board.rb'
 require "observer"
 
 
@@ -10,32 +11,8 @@ class MainController
   BLACK_WINS_EVENT = -11
   WHITE_WINS_EVENT = -22
   
-  WHITE = 1
-  EMPTY = BLANK = 0
-  BLACK = -1
-  
+  attr_reader :roots
   attr_accessor :modified
-
-  def self.neighbors(point)
-    x,y = point
-    return [ [x+1, y], [x, y+1], [x-1, y], [x, y-1] ]
-  end
-  
-  def self.in_bounds?(point)
-    x,y = point
-    return false if x < 0
-    return false if x > 18
-    return false if y < 0
-    return false if y > 18
-    
-    return true
-  end
-  
-  def self.bounded_neighbors(point)
-    return self.neighbors(point).select do |pt|
-      self.in_bounds?(pt)
-    end
-  end
 
   def initialize
     reset!
@@ -44,64 +21,41 @@ class MainController
   # Set up the game board and game conditions. This method is called from
   # initialize, and is the appropriate method for "New game" functionality.
   def reset!
-   @turn = BLACK
+    @turn = TanboBoard::BLACK
 
-    # The game board is  2D 19x19 array
-    @gameboard = []
-    19.times do
-      @gameboard << Array.new(19, 0)
-    end
-
-    # Set all the initial white pieces
-    @gameboard[6][0] = @gameboard[18][0] = @gameboard[0][6] =
-    @gameboard[12][6] = @gameboard[6][12] = @gameboard[18][12] =
-    @gameboard[0][18] = @gameboard[12][18] = 1
-
-    # And all of the initial black ones
-    @gameboard[0][0] = @gameboard[12][0] = @gameboard[6][6] =
-    @gameboard[18][6] = @gameboard[12][12] = @gameboard[18][18] =
-    @gameboard[6][18] = @gameboard[0][12] = -1
+    # The game board is a 19x19 2D grid of intersections (a Go board)
+    @gameboard = TanboBoard.new
 
     # A root is a group of pieces of the same color, connected
     # Each of the initial pieces represents a root, and roots are
-    # never added to the game, only removed
-    # TODO : Need a better data structure...
-    @roots = [
-       Root.new([6 , 0 ],  1, self),
-       Root.new([18, 0 ],  1, self),
-       Root.new([0 , 6 ],  1, self),
-       Root.new([12, 6 ],  1, self),
-       Root.new([6 , 12],  1, self),
-       Root.new([18, 12],  1, self),
-       Root.new([0 , 18],  1, self),
-       Root.new([12, 18],  1, self),
-       Root.new([0 , 0 ], -1, self),
-       Root.new([12, 0 ], -1, self),
-       Root.new([6 , 6 ], -1, self),
-       Root.new([18, 6 ], -1, self),
-       Root.new([12, 12], -1, self),
-       Root.new([18, 18], -1, self),
-       Root.new([6 , 18], -1, self),
-       Root.new([0 , 12], -1, self)
+    # never added to the game, only removed.
+    # A root is created for each of the initial pieces in the loops below,
+    # and that piece is assigned to the root.
+    @roots = []
+
+    # Set all the initial white pieces
+    init_white = [
+      @gameboard[6 ,0 ], @gameboard[18,0 ],
+      @gameboard[0 ,6 ], @gameboard[12,6 ],
+      @gameboard[6 ,12], @gameboard[18,12],
+      @gameboard[0 ,18], @gameboard[12,18]
     ]
-    @pts_to_root = {
-       [6 , 0 ] => @roots[0],
-       [18, 0 ] => @roots[1],
-       [0 , 6 ] => @roots[2],
-       [12, 6 ] => @roots[3],
-       [6 , 12] => @roots[4],
-       [18, 12] => @roots[5],
-       [0 , 18] => @roots[6],
-       [12, 18] => @roots[7],
-       [0 , 0 ] => @roots[8],
-       [12, 0 ] => @roots[9],
-       [6 , 6 ] => @roots[10],
-       [18, 6 ] => @roots[11],
-       [12, 12] => @roots[12],
-       [18, 18] => @roots[13],
-       [6 , 18] => @roots[14],
-       [0 , 12] => @roots[15],
-    }
+    init_white.each do |point|
+      point.color = TanboBoard::WHITE
+      @roots << add_point_to_root(point, Root.new(TanboBoard::WHITE))
+    end
+    
+    # And all of the initial black ones
+    init_black = [
+      @gameboard[0 ,0 ], @gameboard[12,0 ],
+      @gameboard[6 ,6 ], @gameboard[18,6 ],
+      @gameboard[12,12], @gameboard[18,18],
+      @gameboard[6 ,18], @gameboard[0 ,12]
+    ]
+    init_black.each do |point|
+      point.color = TanboBoard::BLACK
+      @roots << add_point_to_root(point, Root.new(TanboBoard::BLACK))
+    end
   end
   
   def set_board(board)
@@ -113,8 +67,8 @@ class MainController
   end
   
   def get_color(point)
-    if self.class.in_bounds?(point)
-      @gameboard[point[0]][point[1]]
+    if point.in_bounds?
+      point.color
     else
       nil
     end
@@ -126,7 +80,7 @@ class MainController
     ans = {}
     0.upto(18) {|x|
       0.upto(18) {|y|
-        test = valid_move?([x, y], color)
+        test = valid_move?(@gameboard[x, y], color)
         ans[[x, y]] = test if test
       }
     }
@@ -146,8 +100,12 @@ class MainController
     winning_color = nil
     for root in @roots
       if winning_color 
+        # There is no winner if we find a root with a different color than the
+        # first color
         return nil if winning_color != root.color
       else
+        # We haven't seen any colors yet. The first one we see is
+        # the potential winner
         winning_color = root.color
       end
     end
@@ -156,8 +114,10 @@ class MainController
   end
   
   def blank?(point)
-    return @gameboard[point[0]][point[1]] == 0
+    return point.color == TanboBoard::BLANK
   end
+  
+  alias :empty? :blank?
   
   # Check if the given board location is a valid move for the given color.
   # If no color is given, the check is performed for the whichever color
@@ -166,10 +126,8 @@ class MainController
   # Returns an array [x, y] of the board location of the piece that makes
   # this a valid move, or nil if there is no such piece. Always returns nil
   # when the game is in the BLACK_WINS or WHITE_WINS state.
-  def valid_move?(point, color=nil)
-    return nil if game_over?
-    
-    x,y = point
+  def valid_move?(point, color=nil)    
+    x,y = point.x, point.y
     color = whose_turn? unless color
     
     # Valid moves are in within the bounds of the board
@@ -181,37 +139,73 @@ class MainController
     adjacent = false
     answer = nil
     if x-1 >= 0 #Check the location to the west
-      if @gameboard[x-1][y] == color
+      adj_point = @gameboard[x-1, y]
+      if adj_point.color == color
         # The west location is the same color as the queried location.
         # For now, this is the answer, unless there are other adjacent
         # pieces, in which case this ceases to be a valid move
-        answer = [x-1, y]
+        answer = adj_point
         adjacent = true
       end
     end
     if y-1 >= 0 #North location
-      if @gameboard[x][y-1] == color
+      adj_point = @gameboard[x, y-1]
+      if adj_point.color == color
         # This is the answer, unless we have already found an adajcent piece
-        answer = (adjacent ? nil : [x, y-1])
+        answer = (adjacent ? nil : adj_point)
         adjacent = true
       end
     end
     if x+1 < 19 #East location
-      if @gameboard[x+1][y] == color
+      adj_point = @gameboard[x+1, y]
+      if adj_point.color == color
         # Ditto
-        answer = (adjacent ? nil : [x+1, y])
+        answer = (adjacent ? nil : adj_point)
         adjacent = true
       end
     end
     if y+1 < 19 #South location
-      if @gameboard[x][y+1] == color
+      adj_point = @gameboard[x, y+1]
+      if adj_point.color == color
         # Ditto
-        answer = (adjacent ? nil : [x, y+1])
+        answer = (adjacent ? nil : adj_point)
         adjacent = true
       end
     end
     
+    #puts "----#{point.inspect} -> #{answer.inspect}"
     return answer
+  end
+  
+  # Adds the given point to the given root. This puts the point in the roots
+  # points array, and calculates any liberties that should be added or removed
+  # based on the value of the new point's neighbors.
+  #
+  # Returns the root, as a convenience for method chaining
+  def add_point_to_root(point, root)
+    # Add the point to the points, delete it from the available liberties
+    point.root = root
+    root.points << point
+    root.liberties.delete(point)
+    
+    # Check each neighbor. If it's a valid move, it's a liberty. Otherwise,
+    # it's not (remove it in case it was previously).
+    point.bounded_neighbors.each do |pair|
+      if valid_move?(pair, root.color)
+        root.liberties << pair
+      else
+        root.liberties.delete(pair)
+      end
+    end
+    
+    
+    return root
+  end
+  
+  def remove_root_pieces(root)
+    for point in root.points
+      point.color = TanboBoard::BLANK
+    end
   end
   
   # Place a piece of the color of the current turn at the indicated x,y
@@ -236,37 +230,34 @@ class MainController
     x,y = point
     
     # Find the root that the newly placed piece is a part of
-    cur_root = @pts_to_root[adj]
+    cur_root = adj.root
     unless cur_root 
       #puts "@pts_to_root: #{@pts_to_root.inspect}"
       raise "Could not find root for pt: " + adj.inspect 
     end
     
     # Set the give location to the current turn's color
-    @gameboard[x][y] = @turn
+    point.color = @turn
     
     # Switch turn control
     mover = @turn
-    @turn = (@turn == BLACK ? WHITE : BLACK)
+    @turn = (@turn == TanboBoard::BLACK ? TanboBoard::WHITE : TanboBoard::BLACK)
     
     # Add the point to the root, which causes the root's "valid moves" to be
     # recalculated
-    cur_root.add_point(point)
-    
-    #Make this board location hash to the root it's in, for later lookups
-    @pts_to_root[point] = cur_root
+    add_point_to_root(point, cur_root)
     
     other_bounded = []
     # Get the new piece's neighbor's neighbors. If they contain roots,
     # let those roots recalculate if their liberties are still valid.
-    for neighbor in self.class.neighbors(point)
+    for neighbor in point.neighbors
       # Skip the neighbor that allowed us to place the piece, and any
       # non-empty points. The status of filled points doesn't change
       # by placing a piece.    
-      next if neighbor == adj || get_color(neighbor) != BLANK
+      next if neighbor == adj || neighbor.color != TanboBoard::BLANK
       
-      for next_neighbor in self.class.neighbors(neighbor)
-        next_root = @pts_to_root[next_neighbor]
+      for next_neighbor in neighbor.neighbors
+        next_root = next_neighbor.root
         if next_root && next_root != cur_root && next_root.color == cur_root.color
           # There is a root next to one of the new pieces neighbors, and it is
           # the same color as the root of this piece. That neighbor, therefore,
@@ -290,13 +281,13 @@ class MainController
     # If the current root is bounded, remove all of it's pieces and delete it
     # from the list of roots (effectively removing it from the board)
     if cur_root.bounded?
-      cur_root.remove!
+      remove_root_pieces(cur_root)
       @roots.delete(cur_root)
     else
       # Otherwise, similarly delete any other roots that have been bounded    
       if not other_bounded.empty?
         for root in other_bounded
-          root.remove!
+          remove_root_pieces(root)
           @roots.delete(root)
         end
       end
@@ -304,7 +295,7 @@ class MainController
     
     # There can be only one...
     if winning_color = game_over? #Intentional assignment, returns nil if no one has won
-      event = (winning_color == WHITE ? WHITE_WINS_EVENT : BLACK_WINS_EVENT)
+      event = (winning_color == TanboBoard::WHITE ? WHITE_WINS_EVENT : BLACK_WINS_EVENT)
       changed
       notify_observers(event)
     end
@@ -312,7 +303,7 @@ class MainController
   
   def remove!(point)
     @modified = true
-    @gameboard[point[0]][point[1]] = 0
+    @gameboard[point[0]][point[1]].color = TanboBoard::BLANK
   end
   
   def random_move
@@ -327,17 +318,13 @@ class MainController
   def debug
     require 'pp'
     
-    @pts_to_root.values.uniq.each do |r|
+    @roots.each do |r|
       puts r.inspect
       puts "=========="
     end
 
     puts "-"*10
     puts output_board
-    puts "-"*10
-    pp @pts_to_root.keys
-    
-    output_board
   end
   
   # Store a simple text representation of the game board. It looks like this:
@@ -375,7 +362,7 @@ class MainController
       end
       ans += "\n"
     end
-    ans += (@turn == WHITE ? "WHITE" : "BLACK")
+    ans += (@turn == TanboBoard::WHITE ? "WHITE" : "BLACK")
     ans += "\n"
     return ans
   end
@@ -409,38 +396,59 @@ class MainController
     end
     
     if(chars.shift == "WHITE")
-      @turn = WHITE
+      @turn = TanboBoard::WHITE
     else
-      @turn = BLACK
+      @turn = TanboBoard::BLACK
     end
     
     reset_roots
   end
   
   def reset_roots
-    @pts_to_root = {}
-    
-    visited = []
-    0.upto(@gameboard.size-1) do |x|
-      0.upto(@gameboard[x].size-1) do |y|
-        color = @gameboard[x][y]
-        visited << [x,y]
-        case color
-          when WHITE
-            
-          when BLACK
-            
-          when '.'
-            
-        end
-      end
-    end
-   
-    @pts_to_root.values.each do |r|
-      r.recalculate!.each do |point|
-        @pts_to_root[point] = r
-      end
-    end
+    # @pts_to_root = {}
+    #  
+    #  visited = []
+    #  0.upto(@gameboard.size-1) do |x|
+    #    0.upto(@gameboard[x].size-1) do |y|
+    #      color = @gameboard[x][y]
+    #      # Skip this square if it's already been visited
+    #      next if visited[[x, y]]
+    #      visited << [x,y]
+    #      # Mark as visited, but skip if its empty
+    #      next if color == TanboBoard::BLANK
+    #      
+    #      # Create a new root for this square and add it to @pts_to_root and @roots
+    #      new_root = Root.new([x, y], color, self))
+    #      new_root.recalculate!
+    #      @roots << (@pts_to_root[[x, y]] = 
+    #    end
+    #  end
+    # 
+    #  @pts_to_root.values.each do |r|
+    #    r.recalculate!.each do |point|
+    #      @pts_to_root[point] = r
+    #    end
+    #  end
   end
+  
+  # def recalculate!(visited)
+  #   seen = @points.dup
+  #   dfs(@points[0], visited)
+  #   @moves.uniq!
+  #   return @points
+  # end
+  # 
+  # def dfs(node, visited)
+  #   visited << node
+  #   if(@controller.get_color(node) == @color)
+  #     @points << node
+  #     calc_valid_moves(node)
+  #   end
+  #   MainController.bounded_neighbors(node).each do |neighbor|
+  #     if (! visited.include?(neighbor)) and @controller.get_color(node) == @color
+  #       dfs(neighbor, visited)
+  #     end
+  #   end
+  # end
 
 end

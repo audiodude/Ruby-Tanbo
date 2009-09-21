@@ -120,9 +120,9 @@ class MainFrame < Frame
     #Game's over dude. Stop doing auto moves
     @auto_move_timer.stop
     
-    if event == MainController::WHITE_WINS_EVENT
+    if event == TanboBoard::WHITE_WINS_EVENT
       @msg_area.set_label("White wins!")
-    elsif event == MainController::BLACK_WINS_EVENT
+    elsif event == TanboBoard::BLACK_WINS_EVENT
       @msg_area.set_label("Black wins!")
     end
   end

@@ -10,8 +10,8 @@ CHANGES:
     auto-playing, use the debug button.
 
 0.1b   (2009-09-19)- Initial 'release'. A working game, playable by two people
-'hot seat' style. Saving games works, but loading them doesn't. There is no
-AI yet.
+    'hot seat' style. Saving games works, but loading them doesn't. There is
+    no AI yet.
 
 Author: Travis Briggs, briggs.travis (at) gmail.com
 ===================================================
