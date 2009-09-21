@@ -1,10 +1,18 @@
+require 'monitor.rb'
+
 class BoardPanel < Panel
+  include MonitorMixin
+  
   BG_BRUSH = Brush.new(Colour.new(232, 232, 160))
   BG_PEN = Pen.new(Colour.new(232, 232, 160))
+  
+  attr_reader :move_queue, :input_ready_cond
   
   def initialize(parent, controller)
     super(parent, :size => [parent.get_client_size.get_width-20, parent.get_client_size.get_height/1.25])
     @controller = controller
+    @move_queue = []
+    @move_queue.extend(MonitorMixin)
     evt_paint() {|event|
       do_paint
     }
@@ -13,9 +21,11 @@ class BoardPanel < Panel
       do_hover(event)
     }
     
-    evt_left_down() {| event|
+    evt_left_down() {|event|
       do_click(event)
     }
+    @input_ready_cond = @move_queue.new_cond
+    @painting_mutex = Mutex.new
   end
   
   def get_board_loc(point)
@@ -50,14 +60,19 @@ class BoardPanel < Panel
   end
   
   def do_paint
-    paint { |dc|
-      dc.set_brush(BG_BRUSH)
-      dc.set_pen(TRANSPARENT_PEN)
-      dc.draw_rectangle(0, 0, self.get_client_size.get_width, self.get_client_size.get_height)
-      
-      draw_board(dc)
-      draw_stones(dc)
-    }
+    if @painting_mutex.try_lock
+      Thread.exclusive do
+        paint { |dc|
+          dc.set_brush(BG_BRUSH)
+          dc.set_pen(TRANSPARENT_PEN)
+          dc.draw_rectangle(0, 0, self.get_client_size.get_width, self.get_client_size.get_height)
+    
+          draw_board(dc)
+          draw_stones(dc)
+        }
+      end
+      @painting_mutex.unlock
+    end
   end
   
   def do_hover(event)
@@ -67,15 +82,20 @@ class BoardPanel < Panel
   
     if @last_hover && @controller.blank?(@controller.get_board[@last_hover[0], @last_hover[1]])
       x, y = @last_hover
-      paint { |dc|
-        dc.set_brush(BG_BRUSH)
-        dc.set_pen(BG_PEN)
-        dc.draw_rectangle(((x-0.5)*w + x0).to_i, ((y-0.5)*h + y0).to_i, w, h)
+      if @painting_mutex.try_lock
+        Thread.exclusive do
+          paint { |dc|
+            dc.set_brush(BG_BRUSH)
+            dc.set_pen(BG_PEN)
+            dc.draw_rectangle(((x-0.5)*w + x0).to_i, ((y-0.5)*h + y0).to_i, w, h)
         
-        dc.set_pen(BLACK_PEN)
-        dc.draw_line(([(x-0.5), 0].max*w).to_i + x0, y*h + y0, ([(x+0.5),18].min*w).to_i + x0, y*h + y0)
-        dc.draw_line(x*w + x0, ([(y-0.5),0].max*h).to_i + y0, x*w + x0, ([(y+0.5),18].min*h).to_i + y0)
-      }
+            dc.set_pen(BLACK_PEN)
+            dc.draw_line(([(x-0.5), 0].max*w).to_i + x0, y*h + y0, ([(x+0.5),18].min*w).to_i + x0, y*h + y0)
+            dc.draw_line(x*w + x0, ([(y-0.5),0].max*h).to_i + y0, x*w + x0, ([(y+0.5),18].min*h).to_i + y0)
+          }
+        end
+        @painting_mutex.unlock
+      end
     end
   
     hover_loc = get_board_loc([event.get_x, event.get_y])
@@ -85,33 +105,43 @@ class BoardPanel < Panel
     @last_hover = [x_loc, y_loc]
     
     if @controller.valid_move?(hover_loc)
-      paint { |dc|
-        dc.set_pen(BLACK_PEN)
+      if @painting_mutex.try_lock
+        Thread.exclusive do
+          paint { |dc|
+            dc.set_pen(BLACK_PEN)
         
-        if @controller.whose_turn? == -1
-          dc.set_brush(BLACK_BRUSH)
-        else
-          dc.set_brush(BG_BRUSH)
+            if @controller.whose_turn? == -1
+              dc.set_brush(BLACK_BRUSH)
+            else
+              dc.set_brush(BG_BRUSH)
+            end
+        
+            dc.draw_circle(x_loc*w + x0, y_loc*h + y0, w/3)
+          }
         end
-        
-        dc.draw_circle(x_loc*w + x0, y_loc*h + y0, w/3)
-      }
+        @painting_mutex.unlock
+      end
     end
   end
   
   def do_click(event)
-    black_turn = @controller.whose_turn? == -1
     point = get_board_loc([event.get_x, event.get_y])
     return unless point
-    move = @controller.valid_move?(point)
-    if move
-      @controller.make_move(point, move)
-      
-      # Refresh the board after doing the move
-      do_paint
-      
-      # If the root got removed, try to hover over for the opposing player
-      do_hover(event)
+    
+    @move_queue.synchronize do
+      @move_queue << [point.x, point.y] if @controller.valid_move?(point)
+      @input_ready_cond.signal
+    end
+    
+    # Let whoever is interested process the new data
+    Thread.pass
+  end
+  
+  def update(event)
+    case event
+      when MainController::BOARD_UPDATE_EVENT        
+        do_paint
+        Thread.pass
     end
   end
   

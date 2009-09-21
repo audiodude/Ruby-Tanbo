@@ -8,11 +8,12 @@ require "observer"
 class MainController
   include Observable
 
+  BOARD_UPDATE_EVENT = -100
   BLACK_WINS_EVENT = -11
   WHITE_WINS_EVENT = -22
   
   attr_reader :roots
-  attr_accessor :modified
+  attr_accessor :modified, :player1, :player2
 
   def initialize
     reset!
@@ -58,6 +59,28 @@ class MainController
     end
   end
   
+  def start!
+    Thread.new {
+      raise "Player 1 not set!" unless @player1
+      raise "Player 2 not set!" unless @player2
+  
+      while not game_over?
+        if whose_turn? == TanboBoard::BLACK
+          next_move = @player1.move
+        else
+          next_move = @player2.move
+        end
+        next unless next_move
+    
+        move_point = @gameboard[next_move[0], next_move[1]]
+        adj = valid_move?(move_point)
+        next unless adj
+    
+        make_move(move_point, adj)
+      end
+    }
+  end
+  
   def get_board
     @gameboard
   end
@@ -70,6 +93,8 @@ class MainController
     end
   end
   
+  ## Convenience for auto-playing for debug. This is the same logic as
+  ## Randbo, but this is NOT the code that Randbo runs. See ai/randbo.rb
   def get_all_moves(color=nil)
     color = whose_turn? unless color
     
@@ -83,6 +108,16 @@ class MainController
     }
     return ans
   end
+  
+  def random_move
+    return if game_over?
+    
+    moves = get_all_moves
+    return if moves.empty? #Guard against race conditions
+    chosen = moves.keys[rand(moves.keys.size)]
+    make_move(chosen, moves[chosen])
+  end
+  ## End convenience auto-play code
   
   def whose_turn?
     return @turn
@@ -290,6 +325,9 @@ class MainController
       end
     end
     
+    changed
+    notify_observers(BOARD_UPDATE_EVENT)
+    
     # There can be only one...
     if winning_color = game_over? #Intentional assignment, returns nil if no one has won
       event = (winning_color == TanboBoard::WHITE ? WHITE_WINS_EVENT : BLACK_WINS_EVENT)
@@ -301,15 +339,6 @@ class MainController
   def remove!(point)
     @modified = true
     @gameboard[point[0]][point[1]].color = TanboBoard::BLANK
-  end
-  
-  def random_move
-    return if game_over?
-    
-    moves = get_all_moves
-    return if moves.empty? #Guard against race conditions
-    chosen = moves.keys[rand(moves.keys.size)]
-    make_move(chosen, moves[chosen])
   end
   
   def debug

@@ -5,6 +5,9 @@ For more information on Tanbo, and the original rule set, see:
 http://www.marksteeregames.com/
 
 CHANGES:
+
+0.5b (2009-09-21) - Game is playable against Ranbo, the Random Tanbo AI!
+
 0.2b (2009-09-20) - Major refactoring, saving games works now!
 
 0.1.1b (2009-09-19) - Turn off auto-playing by default. To toggle
