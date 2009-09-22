@@ -25,6 +25,8 @@ module UCT
   class AIBoard < TanboBoard
 
     def initialize()
+      super()
+      
       @lastmove = UCT::Move.new(UCT::Node::NOT_PLAYED)
       @played_count = 0
       @size = 19 * 19
@@ -66,7 +68,6 @@ module UCT
     end
   
     def play_random_move(player)
-      puts self.inspect
     	possible_moves = get_possible_moves(player)
 
     	selected = rand(possible_moves.size)

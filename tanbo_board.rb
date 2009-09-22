@@ -16,7 +16,7 @@
 # along with this program. See the COPYING file. If not, see
 # <http://www.gnu.org/licenses/>.
 
-require "observer"
+require 'observer'
 
 class TanboBoard
   include Observable
@@ -35,7 +35,7 @@ class TanboBoard
   # directly, you access them through the TanboBoard's [] factory method.
   # So my_board[3, 2] gives you the Point at 3, 2. It will always return the
   # same point for the same TanboBoard instance.
-  class Point
+  class Point  
     attr_reader :x, :y
     attr_accessor :root, :color
     
@@ -45,9 +45,11 @@ class TanboBoard
       @color = BLANK
     end
     
-    def neighbors
-      @board.neighbors(self)
-    end
+    # def neighbors
+    #   return @neighbors if @neighbors
+    #   @neighbors = @board.neighbors(self)
+    #   return @neighbors
+    # end
 
     def in_bounds?
       @board.in_bounds?(self)
@@ -58,11 +60,13 @@ class TanboBoard
     end
 
     def bounded_neighbors
-      @board.bounded_neighbors(self)
+      return @bounded_neighbors if @bounded_neighbors
+      @bounded_neighbors = @board.bounded_neighbors(self)
+      return @bounded_neighbors
     end
     
     def inspect
-      "pt[#{x}, #{y} : #{self.object_id}]"
+      "pt##{self.object_id}[#{x}, #{y}]"
     end
     
     def deep_copy(board)
@@ -74,8 +78,43 @@ class TanboBoard
     end
   end
   
+  class OutOfBoundsPoint < Point
+    @@instance = OutOfBoundsPoint.new(nil, nil, nil)
+    
+    def self.instance
+      @@instance
+    end
+
+    def in_bounds?
+      false
+    end
+
+    def blank?
+      true
+    end
+
+    def bounded_neighbors
+      return @@neighbors if @@neighbors
+      @@neighbors = [OutOfBoundsPoint.instance, OutOfBoundsPoint.instance, OutOfBoundsPoint.instance, OutOfBoundsPoint.instance]
+      return @@neighbors
+    end
+
+    def inspect
+      "pt##{self.object_id}[OOB!]"
+    end
+
+    def deep_copy(board)
+      raise "Cannot copy the out of bounds point!"
+    end
+  end
+  
   def initialize
-    @points = {}
+    # board = self
+    # @points = Hash.new do |hash, key|
+    #   hash[key] = Point.new(key/20, key%20, board)
+    # end
+    @points = Array.new(379)
+    @oob = 
     
     # A root is a group of pieces of the same color, connected
     # Each of the initial pieces represents a root, and roots are
@@ -86,11 +125,12 @@ class TanboBoard
   end
   
   def [](x, y)
-    ans = @points[[x, y]]
-    if not ans
+    return OutOfBoundsPoint.instance if x < 0 || y < 0 || x > 18 || y > 18
+    
+    ans = @points[x*20 + y]
+    unless ans
       ans = Point.new(x, y, self)
-      @points[[x,y]] = ans
-      #puts "#Created " + ans.inspect + " #{ans.color}"
+      @points[x*20 + y] = ans
     end
     return ans
   end
@@ -154,6 +194,7 @@ class TanboBoard
    # when the game is in the BLACK_WINS or WHITE_WINS state.
    def valid_move?(point, color=nil)    
      return nil unless point
+     return nil unless point.in_bounds?
      x,y = point.x, point.y
      color = @turn unless color
 
@@ -179,7 +220,11 @@ class TanboBoard
        adj_point = self[x, y-1]
        if adj_point.color == color
          # This is the answer, unless we have already found an adajcent piece
-         answer = (adjacent ? nil : adj_point)
+         if adjacent
+           return nil
+         else
+           answer = adj_point
+         end
          adjacent = true
        end
      end
@@ -187,7 +232,11 @@ class TanboBoard
        adj_point = self[x+1, y]
        if adj_point.color == color
          # Ditto
-         answer = (adjacent ? nil : adj_point)
+         if adjacent
+           return nil
+         else
+           answer = adj_point
+         end
          adjacent = true
        end
      end
@@ -195,7 +244,11 @@ class TanboBoard
        adj_point = self[x, y+1]
        if adj_point.color == color
          # Ditto
-         answer = (adjacent ? nil : adj_point)
+         if adjacent
+           return nil
+         else
+           answer = adj_point
+         end
          adjacent = true
        end
      end
@@ -260,13 +313,13 @@ class TanboBoard
     other_bounded = []
     # Get the new piece's neighbor's neighbors. If they contain roots,
     # let those roots recalculate if their liberties are still valid.
-    for neighbor in point.neighbors
+    for neighbor in point.bounded_neighbors
       # Skip the neighbor that allowed us to place the piece, and any
       # non-empty points. The status of filled points doesn't change
       # by placing a piece.    
       next if neighbor == adj || neighbor.color != TanboBoard::BLANK
       
-      for next_neighbor in neighbor.neighbors
+      for next_neighbor in neighbor.bounded_neighbors
         next_root = next_neighbor.root
         if next_root && next_root != cur_root && next_root.color == cur_root.color
           # There is a root next to one of the new pieces neighbors, and it is
@@ -314,10 +367,10 @@ class TanboBoard
     end
   end
   
-  def neighbors(point)
-    x,y = point.x, point.y
-    return [ self[x+1, y], self[x, y+1], self[x-1, y], self[x, y-1] ]
-  end
+  # def neighbors(point)
+  #   x,y = point.x, point.y
+  #   return [ self[x+1, y], self[x, y+1], self[x-1, y], self[x, y-1] ]
+  # end
 
   def in_bounds?(point)
     return false if point.x < 0
@@ -338,11 +391,6 @@ class TanboBoard
       ans << self[x-1, y] if x-1 >= 0
       ans << self[x, y-1] if y-1 >= 0
       return ans
-    else
-      # Otherwise, generate all the neihbors and check them all
-      return self.neighbors(point).select do |pt|
-        self.in_bounds?(pt)
-      end
     end
   end
   
@@ -352,12 +400,12 @@ class TanboBoard
   # the object used to make the copy
   def deep_copy(copy = TanboBoard.new)
     copy.turn = @turn
-    
-    copy.points = {}
-    @points.each do |k, v|
+
+    @points.each_with_index do |val, i|
+      next unless val
       # Put a copy of each point, deep_copylicated using the new board, at all of the
       # used indices
-      copy.points[k] = v.deep_copy(copy)
+      copy.points[i] = val.deep_copy(copy)
     end
     
     copy.roots = @roots.dup

@@ -18,7 +18,6 @@
 # along with this program. See the COPYING file. If not, see
 # <http://www.gnu.org/licenses/>.
 
-
 Thread.abort_on_exception = true
 
 if ARGV[0] =~ /nohead/i

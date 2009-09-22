@@ -42,9 +42,12 @@ module UCT
   	end
 	
   	def equal?(oth)
+  	  puts "#{self.inspect} equal? #{oth.inspect}" if $DEBUG_OUT
       return false if oth.player != @player 
       return false unless oth.x == @x
       return false unless oth.y == @y
+      
+      puts "    MOVES EQUAL!" if $DEBUG_OUT
       return true
   	end
   end

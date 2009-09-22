@@ -34,8 +34,8 @@ module UCT
     PLAYER_1   = -0010
     PLAYER_2   = -0001
   
-    attr_reader :nb, :father, :value, :move
-    attr_accessor :mode
+    attr_reader :nb, :value, :move, :children
+    attr_accessor :mode, :father
   
     def self.other_player(player)
     	case player
@@ -221,11 +221,11 @@ module UCT
   	end
 	
   	def advance_and_detach(move) #move is a Move
-  	 	raise unless not father
+  	 	raise unless not @father
 
     	to_del = nil
     	for child in @children
-    	  if @move.equal?(child.move)
+    	  if move.equal?(child.move)
     	    new_root = child
     	    new_root.father = nil
     	    to_del = child
