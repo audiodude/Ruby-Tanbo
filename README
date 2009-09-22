@@ -1,8 +1,12 @@
 Ruby Tanbo: An implementation of the Mark Steere game Tanbo, using Ruby and
-wxRuby for the GUI
+wxRuby for the GUI.
 
 For more information on Tanbo, and the original rule set, see:
 http://www.marksteeregames.com/
+
+USAGE:
+  To run the program first install wxruby ('sudo gem install wxruby').
+  Then do 'ruby app.rb' or simply './app.rb'
 
 THANKS:
   Special thanks to Pierre Gueth and Joel Schaerer and their C++ UCT
@@ -10,12 +14,13 @@ THANKS:
 
 CHANGES:
 
-0.9b (2009-09-21) - Major release! You can now play the game against Ulysses,
+0.9b (2009-09-21) - 
+    Major release! You can now play the game against Ulysses,
     an AI that implements UCT (Upper Confidence bounds applied to Trees). This
     is the state of the art AI system for Go games.
 
-Unfortunately, it's slow as crap at the moment. I'm going to try to trade some
-space for speed before releasing 1.0b
+    Unfortunately, it's slow as crap at the moment. I'm going to try to trade
+    some space for speed before releasing 1.0b
 
 0.5b (2009-09-21) - Game is playable against Ranbo, the Random Tanbo AI!
 
