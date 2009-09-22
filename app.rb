@@ -20,14 +20,25 @@
 
 Thread.abort_on_exception = true
 
-if ARGV[0] =~ /nohead/i
+headless = nil
+debug = nil
+ARGV.each do |arg|
+  headless ||= (arg =~ /nohead/i)
+  debug ||= (arg =~ /debug/i)
+end
+
+$DEBUG_OUT = debug
+$HEADLESS_MODE = headless
+
+if $HEADLESS_MODE
   require 'board_cli.rb'
   require 'ai/human_player.rb'
+  require 'ai/ai_uct.rb'
   
   main_controller = MainController.new
   board = BoardCLI.new(main_controller)
   main_controller.player1 = @player1 = HumanPlayer.new(board)
-  main_controller.player2 = @player2 = AIRandbo.new(main_controller.get_board, TanboBoard::WHITE)    
+  main_controller.player2 = @player2 = AIUlysses.new(TanboBoard::WHITE)    
   main_controller.start!
   
   board.do_paint
@@ -42,16 +53,17 @@ else
   # The wx application root
   class MainApp < App
     def on_init
-      main_controller = MainController.new
-      main_frame = MainFrame.new(main_controller)
-      main_frame.show
+      @main_controller = MainController.new
+      @main_frame = MainFrame.new(@main_controller)
+      @main_frame.show
+      
+      set_top_window(@main_frame)
 
       # Don't let the GUI hang....this lets the bots play each other
-      t = Wx::Timer.new(main_frame)
-      evt_timer(t.id) { Thread.pass }
-      t.start(10)
+      @t = Wx::Timer.new(@main_frame)
+      evt_timer(@t.id) { Thread.pass }
+      @t.start(10)
     end
-
   end
   
   # Run the application

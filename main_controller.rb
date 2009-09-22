@@ -27,11 +27,13 @@ class MainController
   include Observable
   
   attr_reader :roots
-  attr_accessor :modified, :player1, :player2
+  attr_accessor :player1, :player2
 
   RUN = 1
   PAUSE = 0
   STOP = nil
+
+  BOARD_READY_EVENT = -33
 
   def initialize
     @run_mutex = Mutex.new
@@ -71,6 +73,9 @@ class MainController
       point.color = TanboBoard::BLACK
       @gameboard.roots << @gameboard.add_point_to_root(point, Root.new(TanboBoard::BLACK))
     end
+    
+    changed
+    notify_observers(BOARD_READY_EVENT)
   end
   
   def start!
@@ -154,6 +159,14 @@ class MainController
     end
   end
   
+  def modified
+    @gameboard.modified
+  end
+  
+  def modified=(val)
+    @gameboard.modified = val
+  end
+  
   ## Convenience for auto-playing for debug. This is the same logic as
   ## Randbo, but this is NOT the code that Randbo runs. See ai/randbo.rb
   def random_move
@@ -222,6 +235,9 @@ class MainController
     end
     
     create_roots
+    
+    changed
+    notify_observers(BOARD_READY_EVENT)
   end
   
   def create_roots
@@ -251,7 +267,7 @@ class MainController
   def dfs_add_to_root(point, root, visited)
     visited[point] = true
     if(point.color == root.color)
-      add_point_to_root(point, root)
+      @gameboard.add_point_to_root(point, root)
     end
     point.bounded_neighbors.each do |neighbor|
       if (! visited.include?(neighbor)) and neighbor.color == root.color

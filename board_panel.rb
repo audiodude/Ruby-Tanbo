@@ -46,15 +46,13 @@ class BoardPanel < Panel
     
     @input_ready_cond = @move_queue.new_cond
     @painting_mutex = Mutex.new
-    
-    evt_window_destroy() {|event|
-      wait_to_exit(event)
-    }
+    @locked = false
   end
   
-  def wait_to_exit(event)
-    @painting_mutex.lock
-    event.skip
+  def lock!
+    @painting_mutex.synchronize do
+      @locked = true
+    end
   end
   
   def get_board_loc(point)
@@ -91,6 +89,7 @@ class BoardPanel < Panel
   def do_paint
     if @painting_mutex.try_lock
       Thread.exclusive do
+        return if @locked
         paint { |dc|
           dc.set_brush(BG_BRUSH)
           dc.set_pen(TRANSPARENT_PEN)
@@ -113,6 +112,7 @@ class BoardPanel < Panel
       x, y = @last_hover
       if @painting_mutex.try_lock
         Thread.exclusive do
+          return if @locked
           paint { |dc|
             dc.set_brush(BG_BRUSH)
             dc.set_pen(BG_PEN)
@@ -136,6 +136,7 @@ class BoardPanel < Panel
     if @controller.get_board.valid_move?(hover_loc)
       if @painting_mutex.try_lock
         Thread.exclusive do
+          return if @locked
           paint { |dc|
             dc.set_pen(BLACK_PEN)
         

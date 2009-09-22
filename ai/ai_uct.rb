@@ -24,7 +24,6 @@ require 'ai/uct/node.rb'
 require 'ai/uct/move.rb'
 require 'ai/uct/board.rb'
 
-$DEBUG_OUT = true
 class AIUlysses
   attr_reader :player
 
@@ -46,7 +45,11 @@ class AIUlysses
   end
 
   def move(board, last_point)
-    begin_busy_cursor
+    if $HEADLESS_MODE
+      puts "Computing #{@name} move..."
+    else
+      begin_busy_cursor
+    end
     puts "playing move" if $DEBUG_OUT
     puts @root.print_tree if $DEBUG_OUT
 
@@ -68,7 +71,7 @@ class AIUlysses
 	  while ( (!@max_iteration || k < @max_iteration) && 
 	          @root.mode == UCT::Node::NORMAL &&
 	          (end_time - start_time < @max_sec || @root.children.empty?))
-      puts k
+      puts "iteration #{k}" if $DEBUG_OUT
       copy = board.deep_copy(UCT::AIBoard.new)
       winner = @root.play_random_game(copy, @player)
       k += 1
@@ -107,7 +110,11 @@ class AIUlysses
     puts "after playing best_move" if $DEBUG_OUT
     puts @root.print_tree if $DEBUG_OUT
 
-    end_busy_cursor
+    if $HEADLESS_MODE
+      puts "Making #{@name} move"
+    else
+      end_busy_cursor 
+    end
   	return [move.x, move.y]
   end
 end

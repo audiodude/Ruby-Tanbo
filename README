@@ -11,8 +11,14 @@ USAGE:
 THANKS:
   Special thanks to Pierre Gueth and Joel Schaerer and their C++ UCT
   implementation: <http://github.com/joelthelion/uct>
+  
+  And of course, thanks to Mark Steere for the game and his explicit
+  permission for anyone to code it!
 
 CHANGES:
+
+1.0  (2009-09-22) - The game is finished! Fixed Ulysses bug, and optimized
+    code for 3x Ulysses performance improvement. Next stop, net play via GGZ!
 
 0.9b (2009-09-21) - 
     Major release! You can now play the game against Ulysses,

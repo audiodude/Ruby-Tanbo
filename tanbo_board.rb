@@ -21,7 +21,7 @@ require 'observer'
 class TanboBoard
   include Observable
   
-  attr_accessor :points, :turn, :roots
+  attr_accessor :points, :turn, :roots, :modified
   
   BOARD_UPDATE_EVENT = -100
   BLACK_WINS_EVENT = -11
@@ -114,7 +114,8 @@ class TanboBoard
     #   hash[key] = Point.new(key/20, key%20, board)
     # end
     @points = Array.new(379)
-    @oob = 
+    
+    @modified = false
     
     # A root is a group of pieces of the same color, connected
     # Each of the initial pieces represents a root, and roots are

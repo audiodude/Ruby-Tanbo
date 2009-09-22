@@ -26,6 +26,7 @@ class BoardCLI
   
   def initialize(controller)
     @controller = controller
+    @controller.add_observer(self)
     @move_queue = []
     @move_queue.extend(MonitorMixin)
     @input_ready_cond = @move_queue.new_cond
@@ -54,7 +55,7 @@ class BoardCLI
       x, y = $1.to_i, $2.to_i
       
       @move_queue.synchronize do
-        break unless @controller.valid_move?(@controller.get_board[x, y])
+        break unless @controller.get_board.valid_move?(@controller.get_board[x, y])
         @move_queue << [x, y] 
         @input_ready_cond.signal
       end
