@@ -1,51 +1,53 @@
 require 'test/ruby_tanbo_test.rb'
 require 'main_controller.rb'
+require 'test/unit/testsuite'
+
 
 class BoardTest < Test::Unit::TestCase
   include RubyTanboTest
 
   def test_start_position
     msg = "Starting position was found invalid, wrong moves for WHITE at: "
-    point = @main_controller.get_board[6, 0]
+    point = @gameboard[6, 0]
     assert_equal TanboBoard::WHITE, @main_controller.get_color(point), (msg + point.inspect)
-    point = @main_controller.get_board[18, 0]
+    point = @gameboard[18, 0]
     assert_equal TanboBoard::WHITE, @main_controller.get_color(point), (msg + point.inspect)
-    point = @main_controller.get_board[0, 6]
+    point = @gameboard[0, 6]
     assert_equal TanboBoard::WHITE, @main_controller.get_color(point), (msg + point.inspect)
-    point = @main_controller.get_board[12, 6]
+    point = @gameboard[12, 6]
     assert_equal TanboBoard::WHITE, @main_controller.get_color(point), (msg + point.inspect)
-    point = @main_controller.get_board[6, 12]
+    point = @gameboard[6, 12]
     assert_equal TanboBoard::WHITE, @main_controller.get_color(point), (msg + point.inspect)
-    point = @main_controller.get_board[18, 12]
+    point = @gameboard[18, 12]
     assert_equal TanboBoard::WHITE, @main_controller.get_color(point), (msg + point.inspect)
-    point = @main_controller.get_board[0, 18]
+    point = @gameboard[0, 18]
     assert_equal TanboBoard::WHITE, @main_controller.get_color(point), (msg + point.inspect)
-    point = @main_controller.get_board[12, 18]
+    point = @gameboard[12, 18]
     assert_equal TanboBoard::WHITE, @main_controller.get_color(point), (msg + point.inspect)
                
     msg = "Starting position was found invalid, wrong moves for BLACK at: "
-    point = @main_controller.get_board[0, 0]
+    point = @gameboard[0, 0]
     assert_equal TanboBoard::BLACK, @main_controller.get_color(point), (msg + point.inspect)
-    point = @main_controller.get_board[12, 0]
+    point = @gameboard[12, 0]
     assert_equal TanboBoard::BLACK, @main_controller.get_color(point), (msg + point.inspect)
-    point = @main_controller.get_board[6, 6]
+    point = @gameboard[6, 6]
     assert_equal TanboBoard::BLACK, @main_controller.get_color(point), (msg + point.inspect)
-    point = @main_controller.get_board[18, 6]
+    point = @gameboard[18, 6]
     assert_equal TanboBoard::BLACK, @main_controller.get_color(point), (msg + point.inspect)
-    point = @main_controller.get_board[12, 12]
+    point = @gameboard[12, 12]
     assert_equal TanboBoard::BLACK, @main_controller.get_color(point), (msg + point.inspect)
-    point = @main_controller.get_board[18, 18]
+    point = @gameboard[18, 18]
     assert_equal TanboBoard::BLACK, @main_controller.get_color(point), (msg + point.inspect)
-    point = @main_controller.get_board[6, 18]
+    point = @gameboard[6, 18]
     assert_equal TanboBoard::BLACK, @main_controller.get_color(point), (msg + point.inspect)
-    point = @main_controller.get_board[0, 12]
+    point = @gameboard[0, 12]
     assert_equal TanboBoard::BLACK, @main_controller.get_color(point), (msg + point.inspect)
   
     msg = "Starting position was found invalid, expected EMPTY point not empty at: "
     0.upto(18) do |x|
       0.upto(18) do |y|
         unless x%6 == 0 && y%6 == 0
-          point = @main_controller.get_board[x, y]
+          point = @gameboard[x, y]
           assert_equal TanboBoard::BLANK, @main_controller.get_color(point), (msg + point.inspect)
         end
       end
@@ -53,112 +55,111 @@ class BoardTest < Test::Unit::TestCase
   end
 
   def test_black_starts
-    assert_equal TanboBoard::BLACK, @main_controller.whose_turn?
+    assert_equal TanboBoard::BLACK, @gameboard.turn
   end
 
   def test_valid_move
     msg = "Valid WHITE starting move reported as invalid at: "
-    point = @main_controller.get_board[0, 7]
-    assert @main_controller.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-    point = @main_controller.get_board[0, 5]
-    assert @main_controller.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-    point = @main_controller.get_board[1, 18]
-    assert @main_controller.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-    point = @main_controller.get_board[0, 17]
-    assert @main_controller.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-    point = @main_controller.get_board[5, 12]
-    assert @main_controller.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-    point = @main_controller.get_board[6, 13]
-    assert @main_controller.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
+    point = @gameboard[0, 7]
+    assert @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
+    point = @gameboard[0, 5]
+    assert @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
+    point = @gameboard[1, 18]
+    assert @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
+    point = @gameboard[0, 17]
+    assert @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
+    point = @gameboard[5, 12]
+    assert @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
+    point = @gameboard[6, 13]
+    assert @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
   
     msg = "Valid BLACK starting move reported as invalid at: "
-    point = @main_controller.get_board[0, 1]
-    assert @main_controller.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-    point = @main_controller.get_board[1, 0]
-    assert @main_controller.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-    point = @main_controller.get_board[17, 18]
-    assert @main_controller.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-    point = @main_controller.get_board[18, 17]
-    assert @main_controller.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-    point = @main_controller.get_board[7, 6]
-    assert @main_controller.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-    point = @main_controller.get_board[6, 7]
-    assert @main_controller.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
+    point = @gameboard[0, 1]
+    assert @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
+    point = @gameboard[1, 0]
+    assert @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
+    point = @gameboard[17, 18]
+    assert @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
+    point = @gameboard[18, 17]
+    assert @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
+    point = @gameboard[7, 6]
+    assert @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
+    point = @gameboard[6, 7]
+    assert @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
   end
 
   def test_no_invalid_move
     msg = "Invalid move from starting position reported as valid at: "
-    point = @main_controller.get_board[-1,-1]
-    assert ! @main_controller.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-    assert ! @main_controller.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-    point = @main_controller.get_board[19,19]
-    assert ! @main_controller.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-    assert ! @main_controller.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-    point = @main_controller.get_board[-1,19]
-    assert ! @main_controller.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-    assert ! @main_controller.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-    point = @main_controller.get_board[19,-1]
-    assert ! @main_controller.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-    assert ! @main_controller.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-    point = @main_controller.get_board[-532,1087]
-    assert ! @main_controller.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-    assert ! @main_controller.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-    point = @main_controller.get_board[7734,-1985]
-    assert ! @main_controller.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-    assert ! @main_controller.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-    point = @main_controller.get_board[3,4]
-    assert ! @main_controller.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-    assert ! @main_controller.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-    point = @main_controller.get_board[4,4]
-    assert ! @main_controller.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-    assert ! @main_controller.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-    point = @main_controller.get_board[5,4]
-    assert ! @main_controller.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-    assert ! @main_controller.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-    point = @main_controller.get_board[9,0]
-    assert ! @main_controller.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-    assert ! @main_controller.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-    point = @main_controller.get_board[0,10]
-    assert ! @main_controller.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-    assert ! @main_controller.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-    point = @main_controller.get_board[10,0]
-    assert ! @main_controller.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-    assert ! @main_controller.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-    point = @main_controller.get_board[0,18]
-    assert ! @main_controller.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-    assert ! @main_controller.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-    point = @main_controller.get_board[6,6]
-    assert ! @main_controller.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-    assert ! @main_controller.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-    point = @main_controller.get_board[10,18]
-    assert ! @main_controller.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-    assert ! @main_controller.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-    point = @main_controller.get_board[18,10]
-    assert ! @main_controller.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-    assert ! @main_controller.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
+    point = @gameboard[-1,-1]
+    assert ! @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
+    assert ! @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
+    point = @gameboard[19,19]
+    assert ! @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
+    assert ! @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
+    point = @gameboard[-1,19]
+    assert ! @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
+    assert ! @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
+    point = @gameboard[19,-1]
+    assert ! @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
+    assert ! @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
+    point = @gameboard[-532,1087]
+    assert ! @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
+    assert ! @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
+    point = @gameboard[7734,-1985]
+    assert ! @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
+    assert ! @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
+    point = @gameboard[3,4]
+    assert ! @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
+    assert ! @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
+    point = @gameboard[4,4]
+    assert ! @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
+    assert ! @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
+    point = @gameboard[5,4]
+    assert ! @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
+    assert ! @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
+    point = @gameboard[9,0]
+    assert ! @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
+    assert ! @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
+    point = @gameboard[0,10]
+    assert ! @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
+    assert ! @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
+    point = @gameboard[10,0]
+    assert ! @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
+    assert ! @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
+    point = @gameboard[0,18]
+    assert ! @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
+    assert ! @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
+    point = @gameboard[6,6]
+    assert ! @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
+    assert ! @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
+    point = @gameboard[10,18]
+    assert ! @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
+    assert ! @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
+    point = @gameboard[18,10]
+    assert ! @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
+    assert ! @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
   end
   
   def test_right_root_number
-    assert_equal 16, @main_controller.roots.size
+    assert_equal 16, @gameboard.roots.size
   end
   
-  def test_root_points
+  def test_root_points  
     root_points = [
-      @main_controller.get_board[6 ,0 ], @main_controller.get_board[18,0 ],
-      @main_controller.get_board[0 ,6 ], @main_controller.get_board[12,6 ],
-      @main_controller.get_board[6 ,12], @main_controller.get_board[18,12],
-      @main_controller.get_board[0 ,18], @main_controller.get_board[12,18],
-      @main_controller.get_board[0 ,0 ], @main_controller.get_board[12,0 ],
-      @main_controller.get_board[6 ,6 ], @main_controller.get_board[18,6 ],
-      @main_controller.get_board[12,12], @main_controller.get_board[18,18],
-      @main_controller.get_board[6 ,18], @main_controller.get_board[0 ,12]
+      @gameboard[6 ,0 ], @gameboard[18,0 ],
+      @gameboard[0 ,6 ], @gameboard[12,6 ],
+      @gameboard[6 ,12], @gameboard[18,12],
+      @gameboard[0 ,18], @gameboard[12,18],
+      @gameboard[0 ,0 ], @gameboard[12,0 ],
+      @gameboard[6 ,6 ], @gameboard[18,6 ],
+      @gameboard[12,12], @gameboard[18,18],
+      @gameboard[6 ,18], @gameboard[0 ,12]
     ]
-    
+
     for point in root_points
       found = []
-      for root in @main_controller.roots
-        deleted = root.points.delete(point)
-        found << deleted if deleted
+      for root in @gameboard.roots
+        found << root if root.points.include?(point)
       end
       
       assert !found.empty?, "Couldn't find point in any root: " + point.inspect
@@ -168,18 +169,18 @@ class BoardTest < Test::Unit::TestCase
   
   def test_root_liberties
     root_points = [
-      @main_controller.get_board[6 ,0 ], @main_controller.get_board[18,0 ],
-      @main_controller.get_board[0 ,6 ], @main_controller.get_board[12,6 ],
-      @main_controller.get_board[6 ,12], @main_controller.get_board[18,12],
-      @main_controller.get_board[0 ,18], @main_controller.get_board[12,18],
-      @main_controller.get_board[0 ,0 ], @main_controller.get_board[12,0 ],
-      @main_controller.get_board[6 ,6 ], @main_controller.get_board[18,6 ],
-      @main_controller.get_board[12,12], @main_controller.get_board[18,18],
-      @main_controller.get_board[6 ,18], @main_controller.get_board[0 ,12]
+      @gameboard[6 ,0 ], @gameboard[18,0 ],
+      @gameboard[0 ,6 ], @gameboard[12,6 ],
+      @gameboard[6 ,12], @gameboard[18,12],
+      @gameboard[0 ,18], @gameboard[12,18],
+      @gameboard[0 ,0 ], @gameboard[12,0 ],
+      @gameboard[6 ,6 ], @gameboard[18,6 ],
+      @gameboard[12,12], @gameboard[18,18],
+      @gameboard[6 ,18], @gameboard[0 ,12]
     ]
     
     for point in root_points
-      for root in @main_controller.roots
+      for root in @gameboard.roots
         if root.points.include?(point)
           point.bounded_neighbors.each do |lib|
             assert root.liberties.include?(lib), "Root: " + root.inspect + " should have had liberty: " + lib.inspect
@@ -190,17 +191,17 @@ class BoardTest < Test::Unit::TestCase
   end
   
   def test_deep_copy
-    orig_board = @main_controller.get_board
+    orig_board = @gameboard
     copy_board = orig_board.deep_copy
     
-    orig_point = @main_controller.get_board[5, 12]
+    orig_point = @gameboard[5, 12]
     copy_point = copy_board[5, 12]
     
     assert !(orig_point.object_id == copy_point.object_id), "Copied points should not have same object_id"
     assert (orig_point.color == copy_point.color), "Color should be the same for copied points"
     assert (orig_point.root == copy_point.root), "Should have same (null) root"
     
-    orig_point = @main_controller.get_board[0, 12]
+    orig_point = @gameboard[0, 12]
     copy_point = copy_board[0, 12]
     
     assert !(orig_point.object_id == copy_point.object_id), "Copied points should not have same object_id"

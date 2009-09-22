@@ -35,11 +35,13 @@ class Root
   # representing the same point, but sourced from the given board.
   # Used for object copying
   def associate_with(board)
-    @points.map do |point|
-      board[point.x, point.y]
+    @points.map! do |point|
+      point = board[point.x, point.y]
+      point.root = self
+      point
     end
     
-    @liberties.map do |point|
+    @liberties.map! do |point|
       board[point.x, point.y]
     end
   end

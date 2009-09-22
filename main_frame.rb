@@ -23,8 +23,8 @@ class MainFrame < Frame
     @board = BoardPanel.new(self, @controller)
     sizer.add(@board, 40, SHAPED|LEFT|RIGHT|TOP|ALIGN_CENTER_HORIZONTAL, 10)
     
-    @controller.add_observer(self)
-    @controller.add_observer(@board)
+    @controller.get_board.add_observer(self)
+    @controller.get_board.add_observer(@board)
     @auto_move_timer = Wx::Timer.new(self)
     evt_timer(@auto_move_timer.id) {
       @controller.random_move
