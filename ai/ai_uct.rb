@@ -50,8 +50,12 @@ class AIUlysses
     puts "playing move" if $DEBUG_OUT
     puts @root.print_tree if $DEBUG_OUT
 
-    last_move = UCT::Move.new(UCT::Node.other_player(@player), last_point.x, last_point.y)
-
+    if last_point
+      last_move = UCT::Move.new(UCT::Node.other_player(@player), last_point.x, last_point.y)
+    else
+      last_move = UCT::Move.new
+    end
+    
     #reuse last simulations if possibles
 	  @root = @root.advance_and_detach(last_move) if last_move
     saved_simulations = @root.nb
