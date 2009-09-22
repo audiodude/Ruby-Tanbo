@@ -1,28 +1,31 @@
 class AISelectDialog < Dialog
   HUMAN = -10
   AI_RANDBO = -20
+  AI_ULYSSES = -30
   
   def initialize(parent)
     super(parent,  :title => "New Game - Choose Your AI", 
                :pos => [110, 35],  
-               :size => [400, 150],
+               :size => [400, 160],
                :style => DEFAULT_DIALOG_STYLE | STAY_ON_TOP
     )
 
-    self.set_min_size([400, 150])
+    self.set_min_size([400, 160])
     @sizer = Wx::BoxSizer.new(VERTICAL)
 
     @choices_sizer = Wx::BoxSizer.new(HORIZONTAL)
+    
+    @names = ["Human", "Randbo (Random AI)", "Ulysses (UCT algorithm)"]
 
-    @box_p1_choices = RadioBox.new(self, :label => "Player 1 (Black)", :size => [180, 80],
-                                    :choices => ["Human", "Randbo (Random AI)"], 
-                                    :major_dimension => 2, 
+    @box_p1_choices = RadioBox.new(self, :label => "Player 1 (Black)", :size => [180, 100],
+                                    :choices => @names, 
+                                    :major_dimension => 3, 
                                     :style => RA_SPECIFY_ROWS,
                                     :name => "p1_box")
                                 
-    @box_p2_choices = RadioBox.new(self, :label => "Player 2 (White)", :size => [180, 80],
-                                     :choices => ["Human", "Randbo (Random AI)"], 
-                                     :major_dimension => 2, 
+    @box_p2_choices = RadioBox.new(self, :label => "Player 2 (White)", :size => [180, 100],
+                                     :choices => @names, 
+                                     :major_dimension => 3, 
                                      :style => RA_SPECIFY_ROWS,
                                      :name => "p2_box")
     
@@ -56,6 +59,8 @@ class AISelectDialog < Dialog
         return HUMAN
       when 1
         return AI_RANDBO
+      when 2
+        return AI_ULYSSES
     end
   end
 

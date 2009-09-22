@@ -2,6 +2,7 @@ require 'board_panel.rb'
 require 'ai_select_dialog.rb'
 require 'ai/human_player.rb'
 require 'ai/ai_randbo.rb'
+require 'ai/ai_uct.rb'
 
 class MainFrame < Frame
   
@@ -23,8 +24,8 @@ class MainFrame < Frame
     @board = BoardPanel.new(self, @controller)
     sizer.add(@board, 40, SHAPED|LEFT|RIGHT|TOP|ALIGN_CENTER_HORIZONTAL, 10)
     
-    @controller.get_board.add_observer(self)
-    @controller.get_board.add_observer(@board)
+    @controller.add_observer(self)
+    @controller.add_observer(@board)
     @auto_move_timer = Wx::Timer.new(self)
     evt_timer(@auto_move_timer.id) {
       @controller.random_move
@@ -45,21 +46,30 @@ class MainFrame < Frame
     button_sizer.add_spacer(22)
     
     evt_button(@new_button.id) { |event|
-      if(controller.modified)
-        # Return control, doing nothing, if the user says no to aborting the
-        # current game
-        next unless dirty_check          
+      begin
+        @controller.pause!
+        if(controller.modified)
+          # Return control, doing nothing, if the user says no to aborting the
+          # current game
+          next unless dirty_check          
+        end
+      
+        ai_select = AISelectDialog.new(self)
+        next unless ID_OK == ai_select.show_modal
+      
+        @controller.reset!
+        @board.do_paint
+      
+        @controller.player1 = @player1 = get_ai(ai_select.player1_choice, TanboBoard::BLACK)
+        @controller.player2 = @player2 = get_ai(ai_select.player2_choice, TanboBoard::WHITE)    
+        @controller.stop!
+        begin_busy_cursor
+        sleep 0.5
+        end_busy_cursor
+        @controller.start!
+      ensure
+        @controller.unpause!
       end
-      
-      ai_select = AISelectDialog.new(self)
-      next unless ID_OK == ai_select.show_modal
-      
-      @controller.reset!
-      @board.do_paint
-      
-      @controller.player1 = @player1 = get_ai(ai_select.player1_choice, TanboBoard::BLACK)
-      @controller.player2 = @player2 = get_ai(ai_select.player2_choice, TanboBoard::WHITE)    
-      @controller.start!
     }
     
     @save_button = Button.new(self, :label=>"Save Game")
@@ -67,19 +77,25 @@ class MainFrame < Frame
     button_sizer.add_spacer(22)
     
     evt_button(@save_button.id) { |event|
-      picker = FileDialog.new(self, :style => FD_SAVE | FD_OVERWRITE_PROMPT)
-      picker.set_filename("Tanbo_#{Time.new.strftime('%Y.%m.%d-%H.%M')}.tan")
-       next unless ID_YES == picker.show_modal
       begin
-        save_file = File.new(picker.get_path, 'w')
-        save_file.puts(controller.output_board)
-        @controller.modified = false
-      rescue SystemCallError, IOError=>e
-        MessageDialog.new(self, "The file you specified could not be created. Your game was not saved! Check file system permissions and try again.", 
-                          "Problem saving file", 
-                          OK | ICON_EXCLAMATION ).show_modal
+        @controller.pause!
+      
+        picker = FileDialog.new(self, :style => FD_SAVE | FD_OVERWRITE_PROMPT)
+        picker.set_filename("Tanbo_#{Time.new.strftime('%Y.%m.%d-%H.%M')}.tan")
+         next unless ID_YES == picker.show_modal
+        begin
+          save_file = File.new(picker.get_path, 'w')
+          save_file.puts(controller.output_board)
+          @controller.modified = false
+        rescue SystemCallError, IOError=>e
+          MessageDialog.new(self, "The file you specified could not be created. Your game was not saved! Check file system permissions and try again.", 
+                            "Problem saving file", 
+                            OK | ICON_EXCLAMATION ).show_modal
+        ensure
+          save_file.close if save_file
+        end
       ensure
-        save_file.close if save_file
+        @controller.unpause!
       end
     }
     
@@ -88,23 +104,29 @@ class MainFrame < Frame
     button_sizer.add_spacer(22)
     
     evt_button(@load_button.id) { |event|
-      if(controller.modified)
-        # Return control, doing nothing, if the user says no to aborting the
-        # current game
-        next unless dirty_check          
-      end
-      picker = FileDialog.new(self, :style => FD_OPEN | FD_FILE_MUST_EXIST)
-      next unless ID_YES == picker.show_modal
       begin
-        load_file = File.new(picker.get_path, 'r')
-        @controller.parse_board(load_file.read)
-        @board.do_paint
-      rescue SystemCallError, IOError=>e
-        MessageDialog.new(self, "The file you specified could not be opened", 
-                          :style => OK | ICON_EXCLAMATION ).show_modal
-        next
+        @controller.pause!
+        if(controller.modified)
+          # Return control, doing nothing, if the user says no to aborting the
+          # current game
+          next unless dirty_check          
+        end
+        picker = FileDialog.new(self, :style => FD_OPEN | FD_FILE_MUST_EXIST)
+        next unless ID_YES == picker.show_modal
+      
+        begin
+          load_file = File.new(picker.get_path, 'r')
+          @controller.parse_board(load_file.read)
+          @board.do_paint
+        rescue SystemCallError, IOError=>e
+          MessageDialog.new(self, "The file you specified could not be opened", 
+                            :style => OK | ICON_EXCLAMATION ).show_modal
+          next
+        ensure
+          load_file.close if load_file
+        end
       ensure
-        load_file.close if load_file
+        @controller.unpause!
       end
     }
     
@@ -113,11 +135,13 @@ class MainFrame < Frame
     button_sizer.add_stretch_spacer(1)
     
     evt_button(@about_button.id) { |event|
+      @controller.pause!
+      
       # Output state info
       @controller.debug
       
       # Toggle auto playing
-      if (not @controller.game_over?) && @auto_move_timer.is_running
+      if (not @controller.get_board.game_over?) && @auto_move_timer.is_running
         @auto_move_timer.stop
       else
         @auto_move_timer.start((AUTOPLAY_INTERVAL*1000).to_i)
@@ -138,11 +162,11 @@ class MainFrame < Frame
   
   def update(event)    
     case event
-      when MainController::WHITE_WINS_EVENT
+      when TanboBoard::WHITE_WINS_EVENT
         #Game's over dude. Stop doing auto moves
         @auto_move_timer.stop
         @msg_area.set_label("White wins!")
-      when MainController::BLACK_WINS_EVENT
+      when TanboBoard::BLACK_WINS_EVENT
         #Game's over dude. Stop doing auto moves
         @auto_move_timer.stop
         @msg_area.set_label("Black wins!")
@@ -161,7 +185,9 @@ class MainFrame < Frame
       when AISelectDialog::HUMAN
         return HumanPlayer.new(@board)
       when AISelectDialog::AI_RANDBO
-        return AIRandbo.new(@controller, color)
+        return AIRandbo.new(@controller.get_board, color)
+      when AISelectDialog::AI_ULYSSES
+        return AIUlysses.new(color)
     end
   end
   

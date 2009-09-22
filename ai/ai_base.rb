@@ -1,14 +1,14 @@
 class AIBase
   
-  def initialize(controller, color)
-    @controller, @color = controller, color
+  def initialize(gameboard, color)
+    @gameboard, @color = gameboard, color
   end
   
   def available_moves
-    @controller.get_all_moves(@color)
+    @gameboard.get_all_moves(@color)
   end
   
   def game_over?
-    @controller.game_over?
+    @gameboard.game_over?
   end
 end

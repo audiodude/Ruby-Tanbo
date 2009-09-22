@@ -9,7 +9,7 @@ if ARGV[0] =~ /nohead/i
   main_controller = MainController.new
   board = BoardCLI.new(main_controller)
   main_controller.player1 = @player1 = HumanPlayer.new(board)
-  main_controller.player2 = @player2 = HumanPlayer.new(board)    
+  main_controller.player2 = @player2 = AIRandbo.new(main_controller.get_board, TanboBoard::WHITE)    
   main_controller.start!
   
   board.do_paint

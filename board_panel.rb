@@ -25,8 +25,18 @@ class BoardPanel < Panel
     evt_left_down() {|event|
       do_click(event)
     }
+    
     @input_ready_cond = @move_queue.new_cond
     @painting_mutex = Mutex.new
+    
+    evt_window_destroy() {|event|
+      wait_to_exit(event)
+    }
+  end
+  
+  def wait_to_exit(event)
+    @painting_mutex.lock
+    event.skip
   end
   
   def get_board_loc(point)
@@ -105,13 +115,13 @@ class BoardPanel < Panel
     x_loc, y_loc = hover_loc.x, hover_loc.y
     @last_hover = [x_loc, y_loc]
     
-    if @controller.valid_move?(hover_loc)
+    if @controller.get_board.valid_move?(hover_loc)
       if @painting_mutex.try_lock
         Thread.exclusive do
           paint { |dc|
             dc.set_pen(BLACK_PEN)
         
-            if @controller.whose_turn? == -1
+            if @controller.get_board.turn == TanboBoard::BLACK
               dc.set_brush(BLACK_BRUSH)
             else
               dc.set_brush(BG_BRUSH)
@@ -130,7 +140,7 @@ class BoardPanel < Panel
     return unless point
     
     @move_queue.synchronize do
-      @move_queue << [point.x, point.y] if @controller.valid_move?(point)
+      @move_queue << [point.x, point.y] if @controller.get_board.valid_move?(point)
       @input_ready_cond.signal
     end
     
@@ -140,7 +150,7 @@ class BoardPanel < Panel
   
   def update(event)
     case event
-      when MainController::BOARD_UPDATE_EVENT        
+      when TanboBoard::BOARD_UPDATE_EVENT        
         do_paint
         Thread.pass
     end

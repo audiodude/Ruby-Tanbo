@@ -135,6 +135,7 @@ class TanboBoard
    # this a valid move, or nil if there is no such piece. Always returns nil
    # when the game is in the BLACK_WINS or WHITE_WINS state.
    def valid_move?(point, color=nil)    
+     return nil unless point
      x,y = point.x, point.y
      color = @turn unless color
 
@@ -327,8 +328,11 @@ class TanboBoard
     end
   end
   
-  def deep_copy
-    copy = TanboBoard.new
+  # Copies the values of this TanboBoard to the given object (or a new TanboBoard
+  # if no object is given) and returns it. As the name implies, everything is
+  # deeply copied, so the returned object will be completely independent of
+  # the object used to make the copy
+  def deep_copy(copy = TanboBoard.new)
     copy.turn = @turn
     
     copy.points = {}
@@ -347,6 +351,45 @@ class TanboBoard
     return copy
   end
   
+  # A simple text representation of the game board. It looks like this:
+  # b.....w.....b.....w
+  # ...................
+  # ...................
+  # ...................
+  # ...................
+  # ...................
+  # w.....b.....w.....b
+  # ...................
+  # ...................
+  # ...................
+  # ...................
+  # ...................
+  # b.....w.....b.....w
+  # ...................
+  # ...................
+  # ...................
+  # ...................
+  # ...................
+  # w.....b.....w.....b
+  def inspect
+    ans = ''
+    0.upto(18) do |x|
+      0.upto(18) do |y|
+        case self[y, x].color
+          when TanboBoard::WHITE
+            ans += 'w'
+          when TanboBoard::BLACK
+            ans += 'b'
+          when TanboBoard::BLANK
+            ans += '.'
+        end
+      end
+      ans += "\n"
+    end
+    ans += (@turn == TanboBoard::WHITE ? "WHITE" : "BLACK")
+    ans += "\n"
+    return ans
+  end
   ## Convenience for auto-playing for debug. This is the same logic as
   ## Randbo, but this is NOT the code that Randbo runs. See ai/randbo.rb
   def get_all_moves(color=nil)

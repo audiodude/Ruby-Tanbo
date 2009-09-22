@@ -3,7 +3,7 @@ class HumanPlayer
     @board_ui = board_ui
   end
   
-  def move
+  def move(board, last_move)
     move = nil
     @board_ui.move_queue.synchronize do
       @board_ui.input_ready_cond.wait

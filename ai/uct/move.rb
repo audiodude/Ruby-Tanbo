@@ -3,28 +3,29 @@
 
 module UCT
   class Move
-    attr_reader :player, :column
+    attr_reader :player, :x, :y
   
-  	def initialize(player=nil, column=nil)
-  	  @player, @column = player, column
+  	def initialize(player=nil, x=nil, y=nil)
+  	  @player, @x, @y = player, x, y
   	end
 
   	def deep_copy
-  	  copy = Move.new(@player, @column)
+  	  copy = Move.new(@player, @x, @y)
     	return copy
   	end
 	
   	def inspect
   	  if @player != Node::NOT_PLAYED
-  	    return "{column #{@column} for player #{player}}"
+  	    return "{[#{@x}, #{@y}] for player #{player}}"
     	else
-    	  return "c4 null move"
+    	  return "empty move"
     	end
   	end
 	
   	def equal?(oth)
       return false if oth.player != @player 
-      return false unless oth.move.equal?(@move) 
+      return false unless oth.x == @x
+      return false unless oth.y == @y
       return true
   	end
   end

@@ -1,10 +1,19 @@
-class AIUCT
+require 'ai/uct/node.rb'
+require 'ai/uct/move.rb'
+require 'ai/uct/board.rb'
+
+$DEBUG_OUT = true
+class AIUlysses
   attr_reader :player
 
-  def initialize(name, player, max_sec=1.5, max_iteration=100, uct_constant=1)
-    raise if player == UCT::Node::NOT_PLAYED
+  def initialize(color, name="Ulysses", max_sec=1.5, max_iteration=100, uct_constant=1)
+    case color
+      when TanboBoard::BLACK
+        @player = UCT::Node::PLAYER_1
+      when TanboBoard::WHITE
+        @player = UCT::Node::PLAYER_2
+    end
     @name = name
-    @player = player
     @max_sec = max_sec
     @max_iteration = max_iteration
     @root = UCT::Node.new(:uct_constant=>uct_constant)
@@ -14,21 +23,25 @@ class AIUCT
     "Bot (#{@name})"
   end
 
-  def move(board, last_move)
+  def move(board, last_point)
+    begin_busy_cursor
     puts "playing move" if $DEBUG_OUT
     puts @root.print_tree if $DEBUG_OUT
 
+    last_move = UCT::Move.new(UCT::Node.other_player(@player), last_point.x, last_point.y)
+
     #reuse last simulations if possibles
-	  @root=@root.advance_and_detach(last_move) if last_move
-    saved_simulations=@root.nb
+	  @root = @root.advance_and_detach(last_move) if last_move
+    saved_simulations = @root.nb
 
     puts "before simulations" if $DEBUG_OUT
     puts @root.print_tree if $DEBUG_OUT
   
     k = 0
     start_time = end_time = Time.now.to_f
-	  while ((!@max_iteration || k < @max_iteration) && @root.mode == UCT::Node::NORMAL && end_time - start_time < @max_sec)
-      copy = board.deep_copy
+	  while ((!@max_iteration || k < @max_iteration) && @root.mode == UCT::Node::NORMAL && (end_time - start_time < @max_sec || k<2))
+      puts k
+      copy = board.deep_copy(UCT::AIBoard.new)
       winner = @root.play_random_game(copy, @player)
       k += 1
       end_time = Time.now.to_f
@@ -67,7 +80,7 @@ class AIUCT
     puts @root.print_tree if $DEBUG_OUT
 
 
-  	copy = move.deep_copy
-  	return copy
+    end_busy_cursor
+  	return [move.x, move.y]
   end
 end

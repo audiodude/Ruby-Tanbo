@@ -23,7 +23,7 @@ class BoardCLI
   
   def update(event)
     case event
-      when MainController::BOARD_UPDATE_EVENT        
+      when TanboBoard::BOARD_UPDATE_EVENT        
         do_paint
         Thread.pass
     end

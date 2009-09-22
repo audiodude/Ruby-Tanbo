@@ -4,7 +4,18 @@ wxRuby for the GUI
 For more information on Tanbo, and the original rule set, see:
 http://www.marksteeregames.com/
 
+THANKS:
+  Special thanks to Pierre Gueth and Joel Schaerer and their C++ UCT
+  implementation: <http://github.com/joelthelion/uct>
+
 CHANGES:
+
+0.9b (2009-09-21) - Major release! You can now play the game against Ulysses,
+    an AI that implements UCT (Upper Confidence bounds applied to Trees). This
+    is the state of the art AI system for Go games.
+
+Unfortunately, it's slow as crap at the moment. I'm going to try to trade some
+space for speed before releasing 1.0b
 
 0.5b (2009-09-21) - Game is playable against Ranbo, the Random Tanbo AI!
 

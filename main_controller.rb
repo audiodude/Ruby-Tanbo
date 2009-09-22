@@ -1,13 +1,22 @@
 require 'root.rb'
 require 'tanbo_board.rb'
+require 'observer'
 
 # The conroller, which stores the state of the game, calculates
 # valid moves, and calculates the effects of moves.
 class MainController
+  # The controller observes the gameboard, and everyone else observes the controller
+  include Observable
+  
   attr_reader :roots
   attr_accessor :modified, :player1, :player2
 
+  RUN = 1
+  PAUSE = 0
+  STOP = nil
+
   def initialize
+    @run_mutex = Mutex.new
     reset!
   end
   
@@ -16,6 +25,8 @@ class MainController
   def reset!
     # The game board is a 19x19 2D grid of intersections (a Go board)
     @gameboard = TanboBoard.new
+
+    @gameboard.add_observer(self)
 
     @gameboard.turn = TanboBoard::BLACK
 
@@ -45,29 +56,72 @@ class MainController
   end
   
   def start!
+    @running = true
     Thread.new {
-      raise "Player 1 not set!" unless @player1
-      raise "Player 2 not set!" unless @player2
+        raise "Player 1 not set!" unless @player1
+        raise "Player 2 not set!" unless @player2
   
-      while not game_over?
-        if @gameboard.turn == TanboBoard::BLACK
-          next_move = @player1.move
-        else
-          next_move = @player2.move
+        last_move = nil
+        while not @gameboard.game_over?
+          value = RUN
+          @run_mutex.synchronize do
+            value = @running
+          end
+          
+          case value
+            when STOP
+              break
+            when PAUSE
+              next
+          end
+          
+          if @gameboard.turn == TanboBoard::BLACK
+            next_move = @player1.move(@gameboard, last_move)
+          else
+            next_move = @player2.move(@gameboard, last_move)
+          end
+          next unless next_move
+    
+          move_point = @gameboard[next_move[0], next_move[1]]
+          adj = @gameboard.valid_move?(move_point)
+          raise "Invalid move returned from player" unless adj
+    
+          @gameboard.make_move(move_point, adj)
+          last_move = move_point
         end
-        next unless next_move
-    
-        move_point = @gameboard[next_move[0], next_move[1]]
-        adj = valid_move?(move_point)
-        next unless adj
-    
-        make_move(move_point, adj)
-      end
     }
+  end
+  
+  def stop!
+    @run_mutex.synchronize do
+      @running = STOP
+    end
+  end
+  
+  def pause!
+    @run_mutex.synchronize do
+      @running = PAUSE
+    end
+  end
+  
+  def unpause!
+    @run_mutex.synchronize do
+      @running = RUN
+    end
+  end
+  
+  def running?
+    @running
+  end
+  
+  def update(event)
+    changed
+    notify_observers(event)
   end
   
   def set_board(board)
     @gameboard = board
+    @gameboard.add_observer(self)
   end
   
   def get_board
@@ -85,17 +139,17 @@ class MainController
   ## Convenience for auto-playing for debug. This is the same logic as
   ## Randbo, but this is NOT the code that Randbo runs. See ai/randbo.rb
   def random_move
-    return if game_over?
+    return if @gameboard.game_over?
     
     moves = @gameboard.get_all_moves
     return if moves.empty? #Guard against race conditions
     chosen = moves.keys[rand(moves.keys.size)]
-    make_move(chosen, moves[chosen])
+    @gameboard.make_move(chosen, moves[chosen])
   end
   ## End convenience auto-play code
   
   def blank?(point)
-    return point.color == TanboBoard::BLANK
+    return point && point.color == TanboBoard::BLANK
   end
   
   alias :empty? :blank?
@@ -112,44 +166,9 @@ class MainController
     puts output_board
   end
   
-  # Store a simple text representation of the game board. It looks like this:
-  # b.....w.....b.....w
-  # ...................
-  # ...................
-  # ...................
-  # ...................
-  # ...................
-  # w.....b.....w.....b
-  # ...................
-  # ...................
-  # ...................
-  # ...................
-  # ...................
-  # b.....w.....b.....w
-  # ...................
-  # ...................
-  # ...................
-  # ...................
-  # ...................
-  # w.....b.....w......
+  # Return the text representation of the gameboard
   def output_board
-    ans = ''
-    0.upto(18) do |x|
-      0.upto(18) do |y|
-        case @gameboard[y, x].color
-          when TanboBoard::WHITE
-            ans += 'w'
-          when TanboBoard::BLACK
-            ans += 'b'
-          when TanboBoard::BLANK
-            ans += '.'
-        end
-      end
-      ans += "\n"
-    end
-    ans += (@gameboard.turn == TanboBoard::WHITE ? "WHITE" : "BLACK")
-    ans += "\n"
-    return ans
+    return @gameboard.inspect
   end
   
   # Parse a string in the above format (including newlines) and set the state
@@ -157,6 +176,7 @@ class MainController
   def parse_board(str)
     return unless str
     @gameboard = TanboBoard.new
+    @gameboard.add_observer(self)
     @roots = []
     
     chars = str.split(/\n/).collect { |line|
