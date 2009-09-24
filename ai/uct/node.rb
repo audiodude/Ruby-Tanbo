@@ -38,14 +38,14 @@ module UCT
     attr_accessor :mode, :father
   
     def self.other_player(player)
-    	case player
-    	when PLAYER_1:
-    		return PLAYER_2
-    	when PLAYER_2:
-    		return PLAYER_1
+      case player
+      when PLAYER_1:
+        return PLAYER_2
+      when PLAYER_2:
+        return PLAYER_1
       else
-    		raise "Invalid argument to other_player"
-    	end
+        raise "Invalid argument to other_player"
+      end
     end
   
     def initialize(opts = {})
@@ -113,16 +113,16 @@ module UCT
     def get_best_child
       return nil if @children.empty?
 
-    	best_score = 0
-    	best_child = nil
+      best_score = 0
+      best_child = nil
 
       for child in @children
         return child if child.mode == WINNER
       
         if (child.mode==NORMAL && (!best_child || best_score<child.score))
-    			best_score=child.score
-    			best_child=child
-    		end
+          best_score=child.score
+          best_child=child
+        end
       end
     
       return best_child if best_child
@@ -156,10 +156,10 @@ module UCT
           # puts @move.print
 
           if winner == @move.player
-        		propagate_winning_to_granpa 
-      		else
-      		  propagate_loosing_to_daddy
-      		end
+            propagate_winning_to_granpa 
+          else
+            propagate_loosing_to_daddy
+          end
 
           return winner
         end
@@ -215,28 +215,28 @@ module UCT
         return best_child.play_random_game(board, self.class.other_player(player))
     end
 
-  	def score
-  	  return @value/@nb
-  	  #returns a Float
-  	end
-	
-  	def advance_and_detach(move) #move is a Move
-  	 	raise unless not @father
+    def score
+      return @value/@nb
+      #returns a Float
+    end
+  
+    def advance_and_detach(move) #move is a Move
+       raise unless not @father
 
-    	to_del = nil
-    	for child in @children
-    	  if move.equal?(child.move)
-    	    new_root = child
-    	    new_root.father = nil
-    	    to_del = child
-    	    break
-    	  end
-    	end
-    	@children.delete(to_del)
+      to_del = nil
+      for child in @children
+        if move.equal?(child.move)
+          new_root = child
+          new_root.father = nil
+          to_del = child
+          break
+        end
+      end
+      @children.delete(to_del)
 
       return new_root if new_root
       return Node.new(:uct_constant=>@uct_constant)
-  	end
+    end
 
     def print_branch(branch) #takes a ConstNodes
       ans = ""
@@ -289,7 +289,7 @@ module UCT
       @mode = LOSER
     
       if (@father)
-  	    @father.tell_granpa_dad_is_a_loser(self)
+        @father.tell_granpa_dad_is_a_loser(self)
       end
     end
   

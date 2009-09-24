@@ -59,25 +59,25 @@ module UCT
   
     def play_move(move)
       adj = self.valid_move?(self[move.x, move.y])
-    	raise move.inspect unless adj
+      raise move.inspect unless adj
 
-    	self.make_move(self[move.x, move.y], adj)
+      self.make_move(self[move.x, move.y], adj)
 
-    	@played_count += 1
-    	@lastmove = move
+      @played_count += 1
+      @lastmove = move
     end
   
     def play_random_move(player)
-    	possible_moves = get_possible_moves(player)
+      possible_moves = get_possible_moves(player)
 
-    	selected = rand(possible_moves.size)
-    	move = possible_moves[selected]
-    	play_move(move)
+      selected = rand(possible_moves.size)
+      move = possible_moves[selected]
+      play_move(move)
         
-    	return true
+      return true
     end
   
-    def check_for_win	
+    def check_for_win  
       case self.game_over?
         when nil
           return UCT::Node::NOT_PLAYED
@@ -90,15 +90,15 @@ module UCT
   
     def play_random_game(next_player)
       winner = UCT::Node::NOT_PLAYED
-    	player = next_player
-    	while (self.play_random_move(player))
+      player = next_player
+      while (self.play_random_move(player))
         winner = self.check_for_win
 
-    		if winner != UCT::Node::NOT_PLAYED
-    		  return winner
-    		end
-  		 
-    		player=UCT::Node.other_player(player)
+        if winner != UCT::Node::NOT_PLAYED
+          return winner
+        end
+       
+        player=UCT::Node.other_player(player)
       end
     end
   

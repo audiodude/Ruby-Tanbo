@@ -32,18 +32,18 @@
 MoveTanbo::MoveTanbo(Token player, Size x, Size y) : Move(player), x(x), y(y) {}
 
 void MoveTanbo::print() const {
-	if (player != NOT_PLAYED) std::cout<<"{["<<this->x<<", "<<this->y<<"] for player "<<player<<"}";
-	else std::cout<<"tanbo null move";
+  if (player != NOT_PLAYED) std::cout<<"{["<<this->x<<", "<<this->y<<"] for player "<<player<<"}";
+  else std::cout<<"tanbo null move";
 }
 
 Move *MoveTanbo::deepcopy() const {
-	Move *copy=new MoveTanbo(player, x, y);
-	return copy;
+  Move *copy=new MoveTanbo(player, x, y);
+  return copy;
 }
 
 bool MoveTanbo::compare (const Move& abstract_move) const {
   const MoveTanbo &move=dynamic_cast<const MoveTanbo&>(abstract_move);
-	return Move::compare(abstract_move) && x==move.x && y==move.y;
+  return Move::compare(abstract_move) && x==move.x && y==move.y;
 }
 
 class PointTanbo;
@@ -51,26 +51,26 @@ class RootTanbo;
 
 BoardTanbo::BoardTanbo() : lastmove(NOT_PLAYED,-1,-1), played_count(0) {
 
-	//allocate flat
-	// flat=new Token[size];
-	//   for (Token *iter=flat; iter!=flat+size; iter++) *iter=NOT_PLAYED;
-	// 
-	//   //allocate column pointer and playable move cache
-	//   tokens=new Token*[width];
-	//   token_for_columns=new Token*[width];
-	//   Size k=0;
-	//   for (Token *iter=flat; iter<flat+size; iter+=height) {
-	//     tokens[k]=iter;
-	//     token_for_columns[k]=iter+height-1;
-	//     k++;
-	//   }
-	// 
-	//   assert(k==width);
+  //allocate flat
+  // flat=new Token[size];
+  //   for (Token *iter=flat; iter!=flat+size; iter++) *iter=NOT_PLAYED;
+  // 
+  //   //allocate column pointer and playable move cache
+  //   tokens=new Token*[width];
+  //   token_for_columns=new Token*[width];
+  //   Size k=0;
+  //   for (Token *iter=flat; iter<flat+size; iter+=height) {
+  //     tokens[k]=iter;
+  //     token_for_columns[k]=iter+height-1;
+  //     k++;
+  //   }
+  // 
+  //   assert(k==width);
 }
 
 BoardTanbo::~BoardTanbo() {
-	delete [] points;
-	delete [] roots;
+  delete [] points;
+  delete [] roots;
 }
 
 Board *BoardTanbo::deepcopy() const {
@@ -96,39 +96,39 @@ Board *BoardTanbo::deepcopy() const {
 }
 
 void BoardTanbo::print() const {
-	// std::cout<<"  ";
-	//   for (Size column=0; column<width; column++) std::cout<<column;
-	//   std::cout<<std::endl;
-	// 
-	//   std::cout<<" +";
-	//   for (Size column=0; column<width; column++) std::cout<<"-";
-	//   std::cout<<"+"<<std::endl;
-	// 
-	//   for (Size row=0; row<height; row++) {
-	//     std::cout<<row<<"|";
-	//     for (Size column=0; column<width; column++) {
-	//       switch(tokens[column][row]) {
-	//       case NOT_PLAYED:
-	//         std::cout<<" ";
-	//         break;
-	//       case PLAYER_1:
-	//         std::cout<<"x";
-	//         break;
-	//       case PLAYER_2:
-	//         std::cout<<"o";
-	//         break;
-	//       }
-	//     }
-	//     std::cout<<"|"<<row<<std::endl;
-	//   }
-	// 
-	//   std::cout<<" +";
-	//   for (Size column=0; column<width; column++) std::cout<<"-";
-	//   std::cout<<"+"<<std::endl;
-	// 
-	//   std::cout<<"  ";
-	//   for (Size column=0; column<width; column++) std::cout<<column;
-	//   std::cout<<std::endl;
+  // std::cout<<"  ";
+  //   for (Size column=0; column<width; column++) std::cout<<column;
+  //   std::cout<<std::endl;
+  // 
+  //   std::cout<<" +";
+  //   for (Size column=0; column<width; column++) std::cout<<"-";
+  //   std::cout<<"+"<<std::endl;
+  // 
+  //   for (Size row=0; row<height; row++) {
+  //     std::cout<<row<<"|";
+  //     for (Size column=0; column<width; column++) {
+  //       switch(tokens[column][row]) {
+  //       case NOT_PLAYED:
+  //         std::cout<<" ";
+  //         break;
+  //       case PLAYER_1:
+  //         std::cout<<"x";
+  //         break;
+  //       case PLAYER_2:
+  //         std::cout<<"o";
+  //         break;
+  //       }
+  //     }
+  //     std::cout<<"|"<<row<<std::endl;
+  //   }
+  // 
+  //   std::cout<<" +";
+  //   for (Size column=0; column<width; column++) std::cout<<"-";
+  //   std::cout<<"+"<<std::endl;
+  // 
+  //   std::cout<<"  ";
+  //   for (Size column=0; column<width; column++) std::cout<<column;
+  //   std::cout<<std::endl;
 }
 
 bool BoardTanbo::is_move_valid(const Move &abstract_move) const {
@@ -142,13 +142,13 @@ bool BoardTanbo::is_move_valid(const MoveTanbo &move) const {
 }
 
 Moves BoardTanbo::get_possible_moves(Token player) const {
-	Moves moves;
-	
+  Moves moves;
+  
   // for (Size column=0; column<width; column++) {
   //  if (tokens[column]<=token_for_columns[column]) moves.push_back(new MoveTanbo(player,column));
   // }
 
-	return moves;
+  return moves;
 }
 
 void BoardTanbo::play_move(const Move &abstract_move) {
@@ -200,6 +200,6 @@ Token BoardTanbo::check_for_win() const {
   //     if (propagate(row,column,1,1,lastmove.player)+propagate(row,column,-1,-1,lastmove.player)>win_length) return lastmove.player;
   //     if (propagate(row,column,1,-1,lastmove.player)+propagate(row,column,-1,1,lastmove.player)>win_length) return lastmove.player;
 
-	return NOT_PLAYED;
+  return NOT_PLAYED;
 }
 

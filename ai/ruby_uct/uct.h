@@ -39,11 +39,11 @@ public:
     const Node *get_best_child() const;
     Token play_random_game(Board *board,Token player);
 
-	Value get_winning_probability() const;
-	Mode get_mode() const;
-	const Move *get_move() const;
+  Value get_winning_probability() const;
+  Mode get_mode() const;
+  const Move *get_move() const;
     Count get_nb() const;
-	Node * advance_and_detach(const Move * move);
+  Node * advance_and_detach(const Move * move);
 
 protected:
     static void print_branch(const ConstNodes &branch);
@@ -53,10 +53,10 @@ protected:
 
     void update_father(Value value);
     void propagate_winning_to_granpa();
-	void propagate_loosing_to_daddy();
+  void propagate_loosing_to_daddy();
     void recompute_inheritance();
     void tell_granpa_dad_is_a_looser(const Node *dad);
-	double uct_constant;
+  double uct_constant;
 
 private:
     Node *father;

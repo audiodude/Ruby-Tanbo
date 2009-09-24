@@ -30,11 +30,11 @@
 class MoveTanbo : public Move {
 friend class BoardTanbo;
 public:
-	MoveTanbo(Token player, Size x, Size y);
+  MoveTanbo(Token player, Size x, Size y);
 
   virtual void print() const;
-	virtual Move *deepcopy() const;
-	virtual bool compare (const Move& move) const;
+  virtual Move *deepcopy() const;
+  virtual bool compare (const Move& move) const;
 
 private:
   Size x;
@@ -46,30 +46,30 @@ class RootTanbo;
 
 class BoardTanbo : public Board {
 public:
-	BoardTanbo();
-	virtual ~BoardTanbo();
+  BoardTanbo();
+  virtual ~BoardTanbo();
 
   static bool in_bounds(const PointTanbo *point) {
     return (point->x >= 0 && point->x <= 18 && point->y >= 0 && point->y <= 18);
   }
 
   virtual Board *deepcopy() const;
-	virtual void print() const;
-	inline virtual bool is_move_valid(const Move &move) const;
-	inline bool is_move_valid(const MoveTanbo &move) const;
-	virtual Moves get_possible_moves(Token player) const; //FIXME not sure about constness
-	virtual void play_move(const Move &move);
-	virtual bool play_random_move(Token player);
-	virtual Token check_for_win() const;
+  virtual void print() const;
+  inline virtual bool is_move_valid(const Move &move) const;
+  inline bool is_move_valid(const MoveTanbo &move) const;
+  virtual Moves get_possible_moves(Token player) const; //FIXME not sure about constness
+  virtual void play_move(const Move &move);
+  virtual bool play_random_move(Token player);
+  virtual Token check_for_win() const;
 
 private:
-	MoveTanbo lastmove;
+  MoveTanbo lastmove;
 
-	Size width;
-	Size height;
-	Size win_length;
-	Size size, played_count;
-	
+  Size width;
+  Size height;
+  Size win_length;
+  Size size, played_count;
+  
   PointTanbo *points;
   RootTanbo *roots;
 };

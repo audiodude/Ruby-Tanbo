@@ -38,19 +38,19 @@ Node::~Node() {
 }
 
 Node * Node::advance_and_detach(const Move *move) {
-	assert(not father);
-	Node *new_root=NULL;
-	for (Nodes::iterator iter=children.begin();iter!=children.end();iter++) {
-		if ((*iter)->move->compare(*move)) {
-			new_root=*iter;
-			new_root->father=NULL;
-			this->children.erase(iter);
-			break;
+  assert(not father);
+  Node *new_root=NULL;
+  for (Nodes::iterator iter=children.begin();iter!=children.end();iter++) {
+    if ((*iter)->move->compare(*move)) {
+      new_root=*iter;
+      new_root->father=NULL;
+      this->children.erase(iter);
+      break;
         }
-	}
-	
+  }
+  
     delete this;
-	if (new_root) return new_root;
+  if (new_root) return new_root;
     else return new Node(uct_constant);
 }
 
@@ -105,11 +105,11 @@ void Node::print_branch_up() const {
 }
 
 Value Node::get_winning_probability() const {
-	return value/nb;
+  return value/nb;
 }
 
 Mode Node::get_mode() const {
-	return mode;
+  return mode;
 }
 
 Count Node::get_nb() const {
@@ -117,41 +117,41 @@ Count Node::get_nb() const {
 }
 
 const Move *Node::get_move() const {
-	return move;
+  return move;
 }
 
 const Node *Node::get_best_child() const {
-	if (children.empty()) return NULL;
+  if (children.empty()) return NULL;
 
-	Value best_score=0;
-	const Node *best_child=NULL;
+  Value best_score=0;
+  const Node *best_child=NULL;
 
-	for (Nodes::const_iterator iter=children.begin(); iter!=children.end(); iter++) {
-		Node *child=*iter;
+  for (Nodes::const_iterator iter=children.begin(); iter!=children.end(); iter++) {
+    Node *child=*iter;
 
-		if (child->mode==WINNER) return child;
+    if (child->mode==WINNER) return child;
 
-		if (child->mode==NORMAL and (not best_child or best_score<child->value/child->nb)) {
-			best_score=child->value/child->nb;
-			best_child=child;
-		}
-	}
+    if (child->mode==NORMAL and (not best_child or best_score<child->value/child->nb)) {
+      best_score=child->value/child->nb;
+      best_child=child;
+    }
+  }
 
-	if (best_child) return best_child;
+  if (best_child) return best_child;
 
-	//no non-losing move, all move moves are marked loosing...
-	assert(mode==WINNER); //if all child are loosing then this is a winner node
-	int selected=rand() % children.size();
+  //no non-losing move, all move moves are marked loosing...
+  assert(mode==WINNER); //if all child are loosing then this is a winner node
+  int selected=rand() % children.size();
 
-	//std::cout<<"SEPUKU!!!"<<children.size()<<" "<<selected<<std::endl;
-	//print_tree();
+  //std::cout<<"SEPUKU!!!"<<children.size()<<" "<<selected<<std::endl;
+  //print_tree();
 
-	Nodes::const_iterator selected_iter=children.begin();
-	while (selected>0 and selected_iter!=children.end()) {
-		selected--;
-		selected_iter++;
-	}
-	return *selected_iter;
+  Nodes::const_iterator selected_iter=children.begin();
+  while (selected>0 and selected_iter!=children.end()) {
+    selected--;
+    selected_iter++;
+  }
+  return *selected_iter;
 }
 
 Token Node::play_random_game(Board *board,Token player) {
@@ -169,9 +169,9 @@ Token Node::play_random_game(Board *board,Token player) {
         //move->print();
         //std::cout<<std::endl;
 
-		Token winner=board->check_for_win();
-		if (winner==move->player) propagate_winning_to_granpa();
-		else propagate_loosing_to_daddy();
+    Token winner=board->check_for_win();
+    if (winner==move->player) propagate_winning_to_granpa();
+    else propagate_loosing_to_daddy();
 
         return winner;
     }
@@ -279,7 +279,7 @@ void Node::propagate_loosing_to_daddy() {
     mode=LOOSER;
     
     if (father) {
-		father->tell_granpa_dad_is_a_looser(this);
+    father->tell_granpa_dad_is_a_looser(this);
     }
 }
 void Node::recompute_inheritance() {

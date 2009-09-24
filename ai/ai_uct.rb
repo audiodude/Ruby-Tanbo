@@ -60,7 +60,7 @@ class AIUlysses
     end
     
     #reuse last simulations if possibles
-	  @root = @root.advance_and_detach(last_move) if last_move
+    @root = @root.advance_and_detach(last_move) if last_move
     saved_simulations = @root.nb
 
     puts "before simulations" if $DEBUG_OUT
@@ -68,18 +68,18 @@ class AIUlysses
   
     k = 0
     start_time = end_time = Time.now.to_f
-	  while ( (!@max_iteration || k < @max_iteration) && 
-	          @root.mode == UCT::Node::NORMAL &&
-	          (end_time - start_time < @max_sec || @root.children.empty?))
+    while ( (!@max_iteration || k < @max_iteration) && 
+            @root.mode == UCT::Node::NORMAL &&
+            (end_time - start_time < @max_sec || @root.children.empty?))
       puts "iteration #{k}" if $DEBUG_OUT
       copy = board.deep_copy(UCT::AIBoard.new)
       winner = @root.play_random_game(copy, @player)
       k += 1
       end_time = Time.now.to_f
-		end
+    end
 
-	  best_child = @root.get_best_child
-  	raise "Best child is nil" unless best_child
+    best_child = @root.get_best_child
+    raise "Best child is nil" unless best_child
 
     move = best_child.move
 
@@ -87,20 +87,20 @@ class AIUlysses
     puts @root.print_tree if $DEBUG_OUT
     puts @root.print_best_branch_down if $DEBUG_OUT
 
-  	# simulation report
+    # simulation report
     puts "simulated #{k} games (#{saved_simulations} saved) in #{end_time-start_time}"if $DEBUG_OUT
 
-  	# move report
-  	if $DEBUG_OUT
+    # move report
+    if $DEBUG_OUT
       print "playing "
-    	case @root.mode
-      	when UCT::Node::NORMAL
-      		print "normal #{best_child.score} "
-      	when UCT::Node::WINNER
-      		print "losing "
-      	when UCT::Node::LOSER
-      		print "winning "
-    	end
+      case @root.mode
+        when UCT::Node::NORMAL
+          print "normal #{best_child.score} "
+        when UCT::Node::WINNER
+          print "losing "
+        when UCT::Node::LOSER
+          print "winning "
+      end
       print "move "
       puts move.inspect
     end
@@ -115,6 +115,6 @@ class AIUlysses
     else
       end_busy_cursor 
     end
-  	return [move.x, move.y]
+    return [move.x, move.y]
   end
 end

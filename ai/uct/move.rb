@@ -24,31 +24,31 @@ module UCT
   class Move
     attr_reader :player, :x, :y
   
-  	def initialize(player=nil, x=nil, y=nil)
-  	  @player, @x, @y = player, x, y
-  	end
+    def initialize(player=nil, x=nil, y=nil)
+      @player, @x, @y = player, x, y
+    end
 
-  	def deep_copy
-  	  copy = Move.new(@player, @x, @y)
-    	return copy
-  	end
-	
-  	def inspect
-  	  if @player != Node::NOT_PLAYED
-  	    return "{[#{@x}, #{@y}] for player #{player}}"
-    	else
-    	  return "empty move"
-    	end
-  	end
-	
-  	def equal?(oth)
-  	  puts "#{self.inspect} equal? #{oth.inspect}" if $DEBUG_OUT
+    def deep_copy
+      copy = Move.new(@player, @x, @y)
+      return copy
+    end
+  
+    def inspect
+      if @player != Node::NOT_PLAYED
+        return "{[#{@x}, #{@y}] for player #{player}}"
+      else
+        return "empty move"
+      end
+    end
+  
+    def equal?(oth)
+      puts "#{self.inspect} equal? #{oth.inspect}" if $DEBUG_OUT
       return false if oth.player != @player 
       return false unless oth.x == @x
       return false unless oth.y == @y
       
       puts "    MOVES EQUAL!" if $DEBUG_OUT
       return true
-  	end
+    end
   end
 end
