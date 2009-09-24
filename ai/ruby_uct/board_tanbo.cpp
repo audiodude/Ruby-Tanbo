@@ -46,6 +46,8 @@ bool MoveTanbo::compare (const Move& abstract_move) const {
 	return Move::compare(abstract_move) && x==move.x && y==move.y;
 }
 
+class PointTanbo;
+class RootTanbo;
 
 BoardTanbo::BoardTanbo() : lastmove(NOT_PLAYED,-1,-1), played_count(0) {
 

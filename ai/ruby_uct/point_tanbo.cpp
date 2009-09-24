@@ -25,7 +25,7 @@
 
 class BoardTanbo;
 
-PointTanbo::PointTanbo(int x, int y, BoardTanbo *board) {
+PointTanbo::PointTanbo(int x=-1, int y=-1, BoardTanbo *board=NULL) {
   this->x = x;
   this->y = y;
   this->board = board;
@@ -35,7 +35,7 @@ bool PointTanbo::in_bounds() {
   return BoardTanbo::in_bounds(this);
 }
 
-PointTanbo *PointTanbo::bounded_neighbors {
+PointTanbo *PointTanbo::bounded_neighbors() {
   return new PointTanbo();
 }
 
@@ -43,6 +43,6 @@ void PointTanbo::print() const {
   
 }
 
-PointTanbo *PointTanbo::deepcopy() {
-  return new PointTanbo(0, 0, this->board->deepcopy);
+PointTanbo *PointTanbo::deepcopy(BoardTanbo *board) {
+  return new PointTanbo(0, 0, board);
 }

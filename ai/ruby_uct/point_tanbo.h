@@ -36,9 +36,9 @@ public:
   
   bool in_bounds();
   bool blank() { return color == NOT_PLAYED; }
-  PointTanbo *bounded_neighbors;
+  PointTanbo *bounded_neighbors();
   void print() const;
-  PointTanbo *deepcopy();
+  PointTanbo *deepcopy(BoardTanbo *board);
   
   int x;
   int y;
