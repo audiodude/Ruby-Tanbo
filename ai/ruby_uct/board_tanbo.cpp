@@ -49,6 +49,10 @@ bool MoveTanbo::compare (const Move& abstract_move) const {
 class PointTanbo;
 class RootTanbo;
 
+bool BoardTanbo::in_bounds(const PointTanbo *point) {
+  return (point->x >= 0 && point->x <= 18 && point->y >= 0 && point->y <= 18);
+}
+
 BoardTanbo::BoardTanbo() : lastmove(NOT_PLAYED,-1,-1), played_count(0) {
 
   //allocate flat

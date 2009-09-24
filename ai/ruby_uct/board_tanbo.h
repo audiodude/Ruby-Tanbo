@@ -49,9 +49,7 @@ public:
   BoardTanbo();
   virtual ~BoardTanbo();
 
-  static bool in_bounds(const PointTanbo *point) {
-    return (point->x >= 0 && point->x <= 18 && point->y >= 0 && point->y <= 18);
-  }
+  static bool in_bounds(const PointTanbo *point);
 
   virtual Board *deepcopy() const;
   virtual void print() const;
