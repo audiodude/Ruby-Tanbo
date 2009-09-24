@@ -23,6 +23,8 @@
 #include "point_tanbo.h"
 #include "board_tanbo.h"
 
+#include <cassert>
+
 class BoardTanbo;
 
 PointTanbo::PointTanbo(int x=-1, int y=-1, BoardTanbo *board=NULL) {
@@ -36,13 +38,15 @@ bool PointTanbo::in_bounds() {
 }
 
 PointTanbo *PointTanbo::bounded_neighbors() {
+  assert(false);
   return new PointTanbo();
 }
 
 void PointTanbo::print() const {
-  
+  assert(false);
 }
 
 PointTanbo *PointTanbo::deepcopy(BoardTanbo *board) {
+  assert(false);
   return new PointTanbo(0, 0, board);
 }

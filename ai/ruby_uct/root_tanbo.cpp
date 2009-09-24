@@ -21,3 +21,34 @@
 // <http://www.gnu.org/licenses/>.
 
 #include "root_tanbo.h"
+
+#include <cassert>
+
+RootTanbo::RootTanbo(Token color) {
+  this->color = color;
+  assert(false);
+}
+
+void RootTanbo::remove_point(const PointTanbo *point) {
+  assert(false);
+}
+
+bool RootTanbo::bounded() const {
+  assert(false);
+  return false;
+}
+
+void RootTanbo::print() const {
+  assert(false);
+}
+
+RootTanbo *RootTanbo::deepcopy(const BoardTanbo *board) {
+  assert(false);
+  return new RootTanbo(this->color);
+}
+
+void RootTanbo::associate_with(const BoardTanbo *board) {
+  assert(false);
+}
+  
+
