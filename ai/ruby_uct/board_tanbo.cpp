@@ -26,6 +26,8 @@
 
 #include <vector>
 
+#include <boost/make_shared.hpp>
+
 #include <iostream>
 #include <sstream>
 #include <cassert>
@@ -51,15 +53,38 @@ bool MoveTanbo::compare (const Move& abstract_move) const {
 class PointTanbo;
 class RootTanbo;
 
-bool BoardTanbo::in_bounds(const PointTanbo *point) {
-  return (point->x >= 0 && point->x <= 18 && point->y >= 0 && point->y <= 18);
+bool BoardTanbo::in_bounds(const PointTanbo &point) {
+  return (point.x >= 0 && point.x <= 18 && point.y >= 0 && point.y <= 18);
 }
 
-PointTanbo *BoardTanbo::at(int x, int y) {
-  return 0;
+// Allocates a new vector, fills it with the neighbors of the given points that
+// are inbounds, and returns a reference to it.
+std::vector< boost::shared_ptr<PointTanbo> > &BoardTanbo::bounded_neighbors(const PointTanbo &point) {
+  if(this->in_bounds(point)){
+    int x = point.x;
+    int y = point.y;
+    std::vector< boost::shared_ptr<PointTanbo> > *ans = new std::vector< boost::shared_ptr<PointTanbo> >();
+
+    // If the point is in bounds, we only have to check what we're modifiying
+    if(x+1 <= 18) ans->push_back(this->at(x+1, y));
+    if(y+1 <= 18) ans->push_back(this->at(x, y+1));
+    if(x-1 >= 0 ) ans->push_back(this->at(x-1, y));
+    if(y-1 >= 0 ) ans->push_back(this->at(x, y-1));
+  
+    return *ans;
+  }
 }
 
-BoardTanbo::BoardTanbo() : turn(PLAYER_1), roots(16, boost::shared_ptr<RootTanbo>(new RootTanbo(PLAYER_1))), points(380) {
+boost::shared_ptr<PointTanbo> BoardTanbo::at(int x, int y) {
+  int index = x*20 + y;
+  if(points[index].get() == 0) {
+    points[index].reset( new PointTanbo(x, y, boost::shared_ptr<BoardTanbo>(this)) );
+  }
+  return points[index];
+}
+
+BoardTanbo::BoardTanbo() : turn(NOT_PLAYED), roots(), points(379) {
+  this->starting_position();  
   
   //allocate flat
   // flat=new Token[size];
@@ -82,6 +107,66 @@ BoardTanbo::~BoardTanbo() {
   //Not currently needed
 }
 
+void BoardTanbo::starting_position() {
+  turn = PLAYER_1;
+  
+  std::vector< boost::shared_ptr<PointTanbo> > init_white = std::vector< boost::shared_ptr<PointTanbo> >();
+  init_white.reserve(8);
+  init_white.push_back(this->at(6 ,0 ));
+  init_white.push_back(this->at(18,0 ));
+  init_white.push_back(this->at(0 ,6 ));
+  init_white.push_back(this->at(12,6 ));
+  init_white.push_back(this->at(6 ,12));
+  init_white.push_back(this->at(18,12));
+  init_white.push_back(this->at(0 ,18));
+  init_white.push_back(this->at(12,18));
+  
+  for (std::vector< boost::shared_ptr<PointTanbo> >::iterator itr = init_white.begin(); itr != init_white.end(); ++itr ) {
+    boost::shared_ptr<PointTanbo> point = (*itr);
+    point->color = PLAYER_2;
+    boost::shared_ptr<RootTanbo> new_root = boost::shared_ptr<RootTanbo>(new RootTanbo(PLAYER_2));
+    roots.push_back( new_root );
+    this->add_point_to_root(*point, *new_root);
+  }
+  
+  std::vector< boost::shared_ptr<PointTanbo> > init_black = std::vector< boost::shared_ptr<PointTanbo> >();
+  init_black.reserve(8);
+  init_black.push_back(this->at(0 ,0 ));
+  init_black.push_back(this->at(12,0 ));
+  init_black.push_back(this->at(6 ,6 ));
+  init_black.push_back(this->at(18,6 ));
+  init_black.push_back(this->at(12,12));
+  init_black.push_back(this->at(18,18));
+  init_black.push_back(this->at(6 ,18));
+  init_black.push_back(this->at(0 ,12));
+  
+  for (std::vector< boost::shared_ptr<PointTanbo> >::iterator itr = init_black.begin(); itr != init_black.end(); ++itr ) {
+    boost::shared_ptr<PointTanbo> point = (*itr);
+    point->color = PLAYER_1;
+    boost::shared_ptr<RootTanbo> new_root = boost::shared_ptr<RootTanbo>(new RootTanbo(PLAYER_1));
+    roots.push_back( new_root );
+    this->add_point_to_root(*point, *new_root);
+  }
+}
+
+void BoardTanbo::add_point_to_root(PointTanbo &point, RootTanbo &root) {
+  // Add the point to the points, delete it from the available liberties
+  point.root.reset(&root);
+  root.points.push_back(point);
+  root.liberties.delete(point)
+  
+  // Check each neighbor. If it's a valid move, it's a liberty. Otherwise,
+  // it's not (remove it in case it was previously).
+  std::vector<PointTanbo> *bnded_nbs = point.bounded_neighbors();
+  // bnded_nbs.each do |pair|
+  // if valid_move?(pair, root.color)
+  //   root.liberties << pair
+  // else
+  //   root.liberties.delete(pair)
+  // end
+  
+  return root
+}
 
 Board *BoardTanbo::deepcopy() const {
   //     BoardTanbo *copy=new BoardTanbo(width,height,win_length);

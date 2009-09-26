@@ -29,9 +29,9 @@
 
 class BoardTest : public RubyTanboTest {
   CPPUNIT_TEST_SUITE( BoardTest );
+  CPPUNIT_TEST( test_start_position );
   CPPUNIT_TEST( test_black_starts );
   CPPUNIT_TEST( test_right_root_number );
-  CPPUNIT_TEST( test_start_position );
   CPPUNIT_TEST_SUITE_END();
 
 public:
