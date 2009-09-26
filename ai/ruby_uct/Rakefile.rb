@@ -16,6 +16,7 @@
 # along with this program. See the COPYING file. If not, see
 # <http://www.gnu.org/licenses/>.
 
+require 'rbconfig'
 require 'rake/clean'
 require 'pathname'
 
@@ -25,8 +26,32 @@ CLEAN.include('*.o')
 CLEAN.include("#{INTERFACE_NAME}_wrap.cxx")
 CLEAN.include('Makefile')
 CLOBBER.include("#{INTERFACE_NAME}.bundle")
+CLOBBER.include("run_tests")
 
 SRC = FileList['*.cpp'] + FileList['*.h']
+TEST_SRC = FileList['test/test_*.cpp', 'test/*_fixture.cpp']
+COMPILED_TESTS = TEST_SRC.ext('o')
+COMPILED_SRC = FileList['*.o']
+
+task :compile => 'Makefile' do
+  sh "make"
+end
+
+file "testrunner" => [:test_compile] + COMPILED_TESTS do
+  sh "g++ -L/opt/local/lib/ -I#{Config::CONFIG['archdir']} -I/opt/local/include/ -I. -o testrunner #{COMPILED_SRC} #{COMPILED_TESTS} -lruby -lcppunit"
+end
+
+task :test => "testrunner" do
+  sh "./testrunner"
+end
+
+task :test_compile => :compile do
+  COMPILED_SRC.each do |obj|
+    file obj do
+      sh "g++ -c -I/opt/local/include/ -o #{obj} #{obj.ext('cpp')}"
+    end
+  end
+end
 
 task :default => ["#{INTERFACE_NAME}_wrap.bundle"]
 
@@ -42,6 +67,5 @@ file "Makefile" do
   sh "ruby extconfig.rb"
 end
 
-file "#{INTERFACE_NAME}_wrap.bundle" => ["#{INTERFACE_NAME}_wrap.cxx", 'Makefile', 'uct.o'] + SRC do
-  sh "make"
-end
+file "#{INTERFACE_NAME}_wrap.bundle" => ["#{INTERFACE_NAME}_wrap.cxx", 'uct.o'] + SRC + [:compile]
+
