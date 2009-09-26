@@ -20,18 +20,18 @@ require 'rake/clean'
 require 'pathname'
 
 INTERFACE_NAME = 'ruby_uct'
-SRC = FileList['*.cpp'] + FileList['*.h']
+SRC = FileList['*.cpp']
+SRC_HDRS = SRC.ext('h')
 TEST_SRC = FileList['test/test_*.cpp', 'test/*_fixture.cpp']
 TEST_HDRS = TEST_SRC.ext('h')
 COMPILED_TESTS = TEST_SRC.ext('o')
-COMPILED_SRC = FileList['*.o']
+COMPILED_SRC = SRC.ext('o')
 
 CLEAN.include('*.o')
 CLEAN.include("#{INTERFACE_NAME}_wrap.cxx")
 CLEAN.include('Makefile')
-CLEAN.include(COMPILED_TESTS)
+CLEAN.include("testrunner")
 CLOBBER.include("#{INTERFACE_NAME}.bundle")
-CLOBBER.include("run_tests")
 
 COMPILED_SRC.each do |obj|
   file obj do
@@ -39,13 +39,15 @@ COMPILED_SRC.each do |obj|
   end
 end
 
+puts COMPILED_SRC
+
 COMPILED_TESTS.each do |obj|
-  file obj do
+  file obj => [obj.ext('cpp'), obj.ext('h')] do
     sh "g++ -c -I/opt/local/include/ -I#{Dir.pwd} -o #{obj} #{obj.ext('cpp')}"
   end
 end
 
-task :compile => SRC + ['Makefile'] do
+task :compile => SRC + SRC_HDRS + ['Makefile'] do
   sh "make"
 end
 
@@ -73,5 +75,5 @@ file "Makefile" do
   sh "ruby extconfig.rb"
 end
 
-file "#{INTERFACE_NAME}_wrap.bundle" => ["#{INTERFACE_NAME}_wrap.cxx", 'uct.o'] + SRC + [:compile]
+file "#{INTERFACE_NAME}_wrap.bundle" => ["#{INTERFACE_NAME}_wrap.cxx", 'uct.o'] + SRC + SRC_HDRS + [:compile]
 

@@ -27,7 +27,7 @@
 
 class BoardTanbo;
 
-PointTanbo::PointTanbo(int x=-1, int y=-1, BoardTanbo *board=NULL) {
+PointTanbo::PointTanbo(int x=-1, int y=-1, BoardTanbo *board=0) {
   this->x = x;
   this->y = y;
   this->board = board;

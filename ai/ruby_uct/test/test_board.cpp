@@ -21,3 +21,56 @@
 void BoardTest::test_black_starts() {
   CPPUNIT_ASSERT( PLAYER_1 == gameboard->get_turn() );
 }
+
+void BoardTest::test_right_root_number() {
+  CPPUNIT_ASSERT( 16 == gameboard->roots.size() ); 
+}
+
+void BoardTest::test_start_position() {
+  CPPUNIT_ASSERT( true );
+  // msg = "Starting position was found invalid, wrong moves for WHITE at: "
+  //  point = @gameboard[6, 0]
+  //  assert_equal TanboBoard::WHITE, @main_controller.get_color(point), (msg + point.inspect)
+  //  point = @gameboard[18, 0]
+  //  assert_equal TanboBoard::WHITE, @main_controller.get_color(point), (msg + point.inspect)
+  //  point = @gameboard[0, 6]
+  //  assert_equal TanboBoard::WHITE, @main_controller.get_color(point), (msg + point.inspect)
+  //  point = @gameboard[12, 6]
+  //  assert_equal TanboBoard::WHITE, @main_controller.get_color(point), (msg + point.inspect)
+  //  point = @gameboard[6, 12]
+  //  assert_equal TanboBoard::WHITE, @main_controller.get_color(point), (msg + point.inspect)
+  //  point = @gameboard[18, 12]
+  //  assert_equal TanboBoard::WHITE, @main_controller.get_color(point), (msg + point.inspect)
+  //  point = @gameboard[0, 18]
+  //  assert_equal TanboBoard::WHITE, @main_controller.get_color(point), (msg + point.inspect)
+  //  point = @gameboard[12, 18]
+  //  assert_equal TanboBoard::WHITE, @main_controller.get_color(point), (msg + point.inspect)
+  //             
+  //  msg = "Starting position was found invalid, wrong moves for BLACK at: "
+  //  point = @gameboard[0, 0]
+  //  assert_equal TanboBoard::BLACK, @main_controller.get_color(point), (msg + point.inspect)
+  //  point = @gameboard[12, 0]
+  //  assert_equal TanboBoard::BLACK, @main_controller.get_color(point), (msg + point.inspect)
+  //  point = @gameboard[6, 6]
+  //  assert_equal TanboBoard::BLACK, @main_controller.get_color(point), (msg + point.inspect)
+  //  point = @gameboard[18, 6]
+  //  assert_equal TanboBoard::BLACK, @main_controller.get_color(point), (msg + point.inspect)
+  //  point = @gameboard[12, 12]
+  //  assert_equal TanboBoard::BLACK, @main_controller.get_color(point), (msg + point.inspect)
+  //  point = @gameboard[18, 18]
+  //  assert_equal TanboBoard::BLACK, @main_controller.get_color(point), (msg + point.inspect)
+  //  point = @gameboard[6, 18]
+  //  assert_equal TanboBoard::BLACK, @main_controller.get_color(point), (msg + point.inspect)
+  //  point = @gameboard[0, 12]
+  //  assert_equal TanboBoard::BLACK, @main_controller.get_color(point), (msg + point.inspect)
+  // 
+  //  msg = "Starting position was found invalid, expected EMPTY point not empty at: "
+  //  0.upto(18) do |x|
+  //    0.upto(18) do |y|
+  //      unless x%6 == 0 && y%6 == 0
+  //        point = @gameboard[x, y]
+  //        assert_equal TanboBoard::BLANK, @main_controller.get_color(point), (msg + point.inspect)
+  //      end
+  //    end
+  //  end
+}

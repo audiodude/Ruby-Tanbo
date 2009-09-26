@@ -24,9 +24,7 @@
 
 #include <cassert>
 
-RootTanbo::RootTanbo(Token color) {
-  this->color = color;
-  assert(false);
+RootTanbo::RootTanbo(Token init_color) : color(init_color) {
 }
 
 void RootTanbo::remove_point(const PointTanbo *point) {

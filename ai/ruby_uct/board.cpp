@@ -12,7 +12,7 @@ void Move::print() const {
 
 Move *Move::deepcopy() const {
 	assert(false);
-	return NULL;
+	return 0;
 }
 
 bool Move::compare(const Move &move) const {

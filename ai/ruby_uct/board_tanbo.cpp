@@ -24,6 +24,8 @@
 #include "root_tanbo.h"
 #include "point_tanbo.h"
 
+#include <vector>
+
 #include <iostream>
 #include <sstream>
 #include <cassert>
@@ -53,8 +55,12 @@ bool BoardTanbo::in_bounds(const PointTanbo *point) {
   return (point->x >= 0 && point->x <= 18 && point->y >= 0 && point->y <= 18);
 }
 
-BoardTanbo::BoardTanbo() : played_count(0) {
-  turn = PLAYER_1;
+PointTanbo *BoardTanbo::at(int x, int y) {
+  return 0;
+}
+
+BoardTanbo::BoardTanbo() : turn(PLAYER_1), roots(16, boost::shared_ptr<RootTanbo>(new RootTanbo(PLAYER_1))), points(380) {
+  
   //allocate flat
   // flat=new Token[size];
   //   for (Token *iter=flat; iter!=flat+size; iter++) *iter=NOT_PLAYED;
@@ -73,8 +79,7 @@ BoardTanbo::BoardTanbo() : played_count(0) {
 }
 
 BoardTanbo::~BoardTanbo() {
-  delete [] points;
-  delete [] roots;
+  //Not currently needed
 }
 
 

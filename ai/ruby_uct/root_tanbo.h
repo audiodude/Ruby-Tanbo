@@ -29,7 +29,7 @@
 
 class RootTanbo {
 public:
-  RootTanbo(Token color);
+  RootTanbo(Token init_color);
   void remove_point(const PointTanbo *point);
   bool bounded() const;
   void print() const;

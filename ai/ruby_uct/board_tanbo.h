@@ -27,6 +27,9 @@
 #include "point_tanbo.h"
 #include "board.h"
 
+#include <vector>
+#include <boost/shared_ptr.hpp>
+
 #include <cassert>
 
 class MoveTanbo : public Move {
@@ -53,6 +56,8 @@ public:
 
   static bool in_bounds(const PointTanbo *point);
 
+  PointTanbo *at(int x, int y);
+
   virtual Board *deepcopy() const;
   virtual void print() const;
   inline virtual bool is_move_valid(const Move &move) const;
@@ -69,18 +74,12 @@ public:
   //Not implemented
   Move* parse_move_string(Token, const char*) const {
     assert(false);
-    return NULL;
+    return 0;
   }
   
-private:
-  Size width;
-  Size height;
-  Size win_length;
-  Size size, played_count;
-  
   Token turn;
-  PointTanbo *points;
-  RootTanbo *roots;
+  std::vector < boost::shared_ptr<PointTanbo> > points;
+  std::vector < boost::shared_ptr<RootTanbo> > roots;
 };
 
 #endif
