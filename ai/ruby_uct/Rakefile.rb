@@ -16,42 +16,48 @@
 # along with this program. See the COPYING file. If not, see
 # <http://www.gnu.org/licenses/>.
 
-require 'rbconfig'
 require 'rake/clean'
 require 'pathname'
 
 INTERFACE_NAME = 'ruby_uct'
+SRC = FileList['*.cpp'] + FileList['*.h']
+TEST_SRC = FileList['test/test_*.cpp', 'test/*_fixture.cpp']
+TEST_HDRS = TEST_SRC.ext('h')
+COMPILED_TESTS = TEST_SRC.ext('o')
+COMPILED_SRC = FileList['*.o']
 
 CLEAN.include('*.o')
 CLEAN.include("#{INTERFACE_NAME}_wrap.cxx")
 CLEAN.include('Makefile')
+CLEAN.include(COMPILED_TESTS)
 CLOBBER.include("#{INTERFACE_NAME}.bundle")
 CLOBBER.include("run_tests")
 
-SRC = FileList['*.cpp'] + FileList['*.h']
-TEST_SRC = FileList['test/test_*.cpp', 'test/*_fixture.cpp']
-COMPILED_TESTS = TEST_SRC.ext('o')
-COMPILED_SRC = FileList['*.o']
+COMPILED_SRC.each do |obj|
+  file obj do
+    sh "g++ -c -I/opt/local/include/ -o #{obj} #{obj.ext('cpp')}"
+  end
+end
 
-task :compile => 'Makefile' do
+COMPILED_TESTS.each do |obj|
+  file obj do
+    sh "g++ -c -I/opt/local/include/ -I#{Dir.pwd} -o #{obj} #{obj.ext('cpp')}"
+  end
+end
+
+task :compile => SRC + ['Makefile'] do
   sh "make"
 end
 
 file "testrunner" => [:test_compile] + COMPILED_TESTS do
-  sh "g++ -L/opt/local/lib/ -I#{Config::CONFIG['archdir']} -I/opt/local/include/ -I. -o testrunner #{COMPILED_SRC} #{COMPILED_TESTS} -lruby -lcppunit"
+  sh "g++ -L/opt/local/lib/ -o testrunner #{COMPILED_SRC} #{COMPILED_TESTS} -lruby -lcppunit"
 end
 
 task :test => "testrunner" do
   sh "./testrunner"
 end
 
-task :test_compile => :compile do
-  COMPILED_SRC.each do |obj|
-    file obj do
-      sh "g++ -c -I/opt/local/include/ -o #{obj} #{obj.ext('cpp')}"
-    end
-  end
-end
+task :test_compile => TEST_SRC + TEST_HDRS + [:compile]
 
 task :default => ["#{INTERFACE_NAME}_wrap.bundle"]
 

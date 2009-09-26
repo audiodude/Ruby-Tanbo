@@ -18,6 +18,6 @@
 
 #include "test_board.h"
 
-void BoardTest::test_fail() {
-  CPPUNIT_ASSERT( false );
+void BoardTest::test_black_starts() {
+  CPPUNIT_ASSERT( PLAYER_1 == gameboard->get_turn() );
 }

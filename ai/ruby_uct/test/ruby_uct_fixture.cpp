@@ -26,16 +26,19 @@
 #include <cppunit/TestRunner.h>
 #include <cppunit/ui/text/TestRunner.h>
 
-void RubyTanboTest::setUp() {
-    gameboard = new BoardTanbo();
-}
+#include <iostream>
+// 
+// void RubyTanboTest::setUp() {
+//   std::cout << "Creating board";
+//   gameboard = new BoardTanbo();
+// }
+// 
+// void RubyTanboTest::tearDown() {
+//   std::cout << "Deleting board";
+//   delete gameboard;
+// }
 
-void RubyTanboTest::tearDown() {
-    delete gameboard;
-}
-
-int main( int argc, char **argv)
-{
+int main( int argc, char **argv) {
   CppUnit::TextUi::TestRunner runner;
   runner.addTest( BoardTest::suite() );
   runner.run();

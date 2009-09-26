@@ -25,18 +25,15 @@
 #include <cppunit/TestSuite.h>
 #include <cppunit/TestCaller.h>
 #include <cppunit/TestRunner.h>
+#include <cppunit/extensions/HelperMacros.h>
 
 class BoardTest : public RubyTanboTest {
+  CPPUNIT_TEST_SUITE( BoardTest );
+  CPPUNIT_TEST( test_black_starts );
+  CPPUNIT_TEST_SUITE_END();
+
 public:
-  static CppUnit::Test *suite() {
-    CppUnit::TestSuite *suiteOfTests = new CppUnit::TestSuite( "BoardTest" );
-    suiteOfTests->addTest( new CppUnit::TestCaller<BoardTest>( 
-                                   "test_fail", 
-                                   &BoardTest::test_fail ) );
-    return suiteOfTests;
-  }
-  
-  void test_fail();
+  void test_black_starts();
 };
 
 // class BoardTest < Test::Unit::TestCase
@@ -90,9 +87,6 @@ public:
 //     end
 //   end
 // 
-//   def test_black_starts
-//     assert_equal TanboBoard::BLACK, @gameboard.turn
-//   end
 // 
 //   def test_valid_move
 //     msg = "Valid WHITE starting move reported as invalid at: "

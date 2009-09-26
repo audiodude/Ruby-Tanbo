@@ -27,7 +27,7 @@
 #include <cppunit/TestRunner.h>
 
 class RubyTanboTest : public CppUnit::TestFixture {
-private:
+protected:
   BoardTanbo *gameboard;
 public:
   virtual void setUp();

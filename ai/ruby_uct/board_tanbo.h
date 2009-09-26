@@ -60,6 +60,10 @@ public:
   virtual bool play_random_move(Token player);
   virtual Token check_for_win() const;
 
+  Token get_turn() const {
+    return this->turn;
+  }
+  
 private:
   MoveTanbo lastmove;
 
@@ -68,6 +72,7 @@ private:
   Size win_length;
   Size size, played_count;
   
+  Token turn;
   PointTanbo *points;
   RootTanbo *roots;
 };
