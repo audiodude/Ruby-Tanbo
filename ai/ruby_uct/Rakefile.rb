@@ -50,7 +50,7 @@ task :compile => SRC + ['Makefile'] do
 end
 
 file "testrunner" => [:test_compile] + COMPILED_TESTS do
-  sh "g++ -L/opt/local/lib/ -o testrunner #{COMPILED_SRC} #{COMPILED_TESTS} -lruby -lcppunit"
+  sh "g++ -L/opt/local/lib/ -o testrunner #{COMPILED_TESTS} #{COMPILED_SRC} -lruby -lcppunit"
 end
 
 task :test => "testrunner" do

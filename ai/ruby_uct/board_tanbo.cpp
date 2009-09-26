@@ -53,8 +53,8 @@ bool BoardTanbo::in_bounds(const PointTanbo *point) {
   return (point->x >= 0 && point->x <= 18 && point->y >= 0 && point->y <= 18);
 }
 
-BoardTanbo::BoardTanbo() : lastmove(NOT_PLAYED,-1,-1), played_count(0) {
-
+BoardTanbo::BoardTanbo() : played_count(0) {
+  turn = PLAYER_1;
   //allocate flat
   // flat=new Token[size];
   //   for (Token *iter=flat; iter!=flat+size; iter++) *iter=NOT_PLAYED;
@@ -76,6 +76,7 @@ BoardTanbo::~BoardTanbo() {
   delete [] points;
   delete [] roots;
 }
+
 
 Board *BoardTanbo::deepcopy() const {
   //     BoardTanbo *copy=new BoardTanbo(width,height,win_length);

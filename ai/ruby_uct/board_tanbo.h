@@ -27,6 +27,8 @@
 #include "point_tanbo.h"
 #include "board.h"
 
+#include <cassert>
+
 class MoveTanbo : public Move {
 friend class BoardTanbo;
 public:
@@ -61,12 +63,16 @@ public:
   virtual Token check_for_win() const;
 
   Token get_turn() const {
-    return this->turn;
+    return turn;
+  }
+  
+  //Not implemented
+  Move* parse_move_string(Token, const char*) const {
+    assert(false);
+    return NULL;
   }
   
 private:
-  MoveTanbo lastmove;
-
   Size width;
   Size height;
   Size win_length;
