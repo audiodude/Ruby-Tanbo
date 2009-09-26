@@ -6,7 +6,7 @@
 
 <h1>Windows XP</h1>
 <ol>
-<li>Install Ruby 1.8.6 using the Windows one click installer.<br>
+<li>Install Ruby 1.8.6 using the Windows one click installer, following these steps:<br>
   <a style="margin-left:2em" href="one_click.png"><img width="399" height="266" src="images/one_click.png"/></a>
   <ol>
     <li>Go to the file download page for the Windows Ruby one click installer: <a href="http://rubyforge.org/frs/?group_id=167">http://rubyforge.org/frs/?group_id=167</a></li>
@@ -17,7 +17,7 @@
   
 <li>Install msvcp711.dll. It's a C++ runtime for windows (the wxRuby distribution needs msvcp71.dll, see the discussion at <a href="http://www.ruby-forum.com/topic/140300#new">http://www.ruby-forum.com/topic/140300#new</a>). Where do you get them, you ask? Sketchy 3rd party sites (Google it. I used dll-files.com). Once you get the files, put them in your `C:\WINDOWS\system32\` folder. If you want, you can get them from me at: <a href="www.boxofmonocles.com/msvcp71.zip">msvcp71.zip</a> and <a href="www.boxofmonocles.com/msvcr71.zip">msvcr71.zip</a>. I'm going to talk to the wxruby people about how sketchy/bad this is.</li>
 
-<li>Install wxRuby, a Ruby binding to the <a href="http://www.wxwidgets.org/">wxWidgets windowing toolkit</a>.
+<li>Install wxRuby, a Ruby binding to the <a href="http://www.wxwidgets.org/">wxWidgets windowing toolkit</a>, following these steps:
   <ol>
     <li>Open a Windows command shell window. The easiest way to do this is "Start Menu -> Run...". Simply type 'cmd' and hit okay.<br><img src="images/cmd_shell.png"/></li>
     <li>Type 'gem install wxruby' and hit enter.</li>
@@ -26,31 +26,36 @@
   
     <li>Leave the command window open, you'll be using it to launch Ruby Tanbo.</li>
   
-    <li>Here's the full interaction (USERNAME is your Windows XP user name, ie "john.smith" or "jsmithnumberone" or whatever):
-      <blockquote><pre>
-Microsoft Windows XP [Version 5.1.2600]
-(C) Copyright 1985-2001 Microsoft Corp.
-  
-C:\Documents and Settings\USERNAME>gem install wxruby
-Bulk updating Gem source index for: http://gems.rubyforge.org
-Select which gem to install for your platform (i386-mswin32)
- 1. wxruby 2.0.1 (universal-darwin-9)
- 2. wxruby 2.0.1 (x86-mingw32)
- 3. wxruby 2.0.1 (x86-linux)
- 4. wxruby 2.0.1 (x86-mswin32-60)
- 5. Skip this gem
- 6. Cancel installation
-> 4
-Successfully installed wxruby-2.0.1-x86-mswin32-60
-C:\Documents and Settings\USERNAME>
-</pre></blockquote>
-    </li>
+    <li> <a href="interaction"> Check out the sample interaction </a> </li>
   </ol>
         
 <li>Download and extract the Ruby Tanbo .zip file: <a href="http://www.boxofmonocles.com/ruby_tanbo_10.zip">http://www.boxofmonocles.com/ruby_tanbo_10.zip</a></li>
 
 <li>You should now be able to double-click app.rb and get a Tanbo board!</li>
 </ol>
+
+<a name="interaction"/>Sample XP Command shell interaction (USERNAME is your Windows XP user name, ie "john.smith" or "jsmithnumberone" or whatever):
+<blockquote>
+<pre>
+<code>
+        Microsoft Windows XP [Version 5.1.2600]
+        (C) Copyright 1985-2001 Microsoft Corp.
+        C:\Documents and Settings\USERNAME>gem install wxruby
+
+        Bulk updating Gem source index for: http://gems.rubyforge.org
+        Select which gem to install for your platform (i386-mswin32)
+         1. wxruby 2.0.1 (universal-darwin-9)
+         2. wxruby 2.0.1 (x86-mingw32)
+         3. wxruby 2.0.1 (x86-linux)
+         4. wxruby 2.0.1 (x86-mswin32-60)
+         5. Skip this gem
+         6. Cancel installation
+        > 4
+        Successfully installed wxruby-2.0.1-x86-mswin32-60
+        C:\Documents and Settings\USERNAME>
+</code>
+</pre>
+<blockquote>
 
 <h1>Mac OS X 10.5</h1>
 
