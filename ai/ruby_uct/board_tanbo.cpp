@@ -246,12 +246,81 @@ bool BoardTanbo::is_move_valid(const MoveTanbo &move) {
 }
 
 bool BoardTanbo::is_move_valid(const PointTanbo &point, Token color) const {
+  if(! this->in_bounds(point)) {
+    return false;
+  }
+  
+  int x = point.x;
+  int y = point.y;
   if(color == NOT_PLAYED) {
     color = turn;
   }
   
+  // # Valid moves are in within the bounds of the board
+  if(x < 0 || y < 0 || x > 18 || y > 18) {
+    return false;
+  }
+  
+  if(point.color != NOT_PLAYED) {
+    return false;
+  }
+  
+  // Implementation not finished, see commented out code below...
   assert(false);
   return false;
+  
+  // Factor this into get_adjacent_root() method...
+  // adjacent = false
+  // answer = nil
+  // if x-1 >= 0 #Check the location to the west
+  //  adj_point = self[x-1, y]
+  //  if adj_point.color == color
+  //    # The west location is the same color as the queried location.
+  //    # For now, this is the answer, unless there are other adjacent
+  //    # pieces, in which case this ceases to be a valid move
+  //    answer = adj_point
+  //    adjacent = true
+  //  end
+  // end
+  // if y-1 >= 0 #North location
+  //  adj_point = self[x, y-1]
+  //  if adj_point.color == color
+  //    # This is the answer, unless we have already found an adajcent piece
+  //    if adjacent
+  //      return nil
+  //    else
+  //      answer = adj_point
+  //    end
+  //    adjacent = true
+  //  end
+  // end
+  // if x+1 < 19 #East location
+  //  adj_point = self[x+1, y]
+  //  if adj_point.color == color
+  //    # Ditto
+  //    if adjacent
+  //      return nil
+  //    else
+  //      answer = adj_point
+  //    end
+  //    adjacent = true
+  //  end
+  // end
+  // if y+1 < 19 #South location
+  //  adj_point = self[x, y+1]
+  //  if adj_point.color == color
+  //    # Ditto
+  //    if adjacent
+  //      return nil
+  //    else
+  //      answer = adj_point
+  //    end
+  //    adjacent = true
+  //  end
+  // end
+  // 
+  // #puts "----#{point.inspect} -> #{answer.inspect}"
+  // return answer
 }
 
 Moves BoardTanbo::get_possible_moves(Token player) const {
