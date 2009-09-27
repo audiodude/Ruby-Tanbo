@@ -24,5 +24,7 @@ $srcs = %w[uct.cpp ruby_uct.cpp ruby_uct_wrap.cxx]
 # Give it a name
 extension_name = 'ruby_uct'
 
+$CFLAGS = '-g ' + $CFLAGS
+
 # Do the work
 create_makefile(extension_name)

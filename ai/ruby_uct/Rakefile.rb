@@ -33,6 +33,7 @@ CLEAN.include('*.o')
 CLEAN.include("#{INTERFACE_NAME}_wrap.cxx")
 CLEAN.include('Makefile')
 CLEAN.include("testrunner")
+CLEAN.include(COMPILED_TESTS)
 CLOBBER.include("#{INTERFACE_NAME}.bundle")
 
 COMPILED_SRC.each do |obj|
@@ -40,8 +41,6 @@ COMPILED_SRC.each do |obj|
     sh "g++ -c -I/opt/local/include/ -o #{obj} #{obj.ext('cpp')}"
   end
 end
-
-puts COMPILED_SRC
 
 COMPILED_TESTS.each do |obj|
   file obj => [obj.ext('cpp'), obj.ext('h')] do

@@ -89,7 +89,7 @@ PointTanboVecPtr BoardTanbo::bounded_neighbors(const PointTanbo &point) {
   if(this->in_bounds(point)){
     int x = point.x;
     int y = point.y;
-    PointTanboVecPtr ans = PointTanboVecPtr();
+    PointTanboVecPtr ans = PointTanboVecPtr(new std::vector< boost::shared_ptr<PointTanbo> >());
     ans->reserve(4);
 
     // If the point is in bounds, we only have to check what we're modifiying
