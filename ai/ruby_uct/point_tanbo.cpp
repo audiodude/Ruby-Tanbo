@@ -23,30 +23,39 @@
 #include "point_tanbo.h"
 #include "board_tanbo.h"
 
+#include <boost/make_shared.hpp>
+
 #include <cassert>
 
 class BoardTanbo;
 
-PointTanbo::PointTanbo(int x=-1, int y=-1, BoardTanbo *board=0) {
-  this->x = x;
-  this->y = y;
-  this->board = board;
+PointTanbo::PointTanbo(int the_x=-1, int the_y=-1, boost::shared_ptr<BoardTanbo> the_board=boost::make_shared<BoardTanbo>()) 
+  : x(the_x), y(the_y), board(the_board) {
+}
+
+bool PointTanbo::operator==(const PointTanbo &other) const {
+  if(this->x != other.x) return false;
+  if(this->y != other.y) return false;
+  if( &(this->board) != &(other.board) ) return false;
+  return true;
 }
 
 bool PointTanbo::in_bounds() {
-  return BoardTanbo::in_bounds(this);
+  return BoardTanbo::in_bounds(*this);
 }
 
-PointTanbo *PointTanbo::bounded_neighbors() {
-  assert(false);
-  return new PointTanbo();
+PointTanboVecPtr PointTanbo::bounded_neighbors() {
+  if (! cached_neighbors) {
+    cached_neighbors = board->bounded_neighbors(*this);
+  }
+  return cached_neighbors;
 }
 
 void PointTanbo::print() const {
   assert(false);
 }
 
-PointTanbo *PointTanbo::deepcopy(BoardTanbo *board) {
+boost::shared_ptr<PointTanbo> PointTanbo::deepcopy(boost::shared_ptr<BoardTanbo> board) {
   assert(false);
-  return new PointTanbo(0, 0, board);
+  return boost::make_shared<PointTanbo>(-1, -1, board);
 }

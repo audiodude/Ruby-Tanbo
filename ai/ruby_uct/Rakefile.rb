@@ -27,6 +27,8 @@ TEST_HDRS = TEST_SRC.ext('h')
 COMPILED_TESTS = TEST_SRC.ext('o')
 COMPILED_SRC = SRC.ext('o')
 
+DEBUG_COMPILE = true;
+
 CLEAN.include('*.o')
 CLEAN.include("#{INTERFACE_NAME}_wrap.cxx")
 CLEAN.include('Makefile')
@@ -43,7 +45,7 @@ puts COMPILED_SRC
 
 COMPILED_TESTS.each do |obj|
   file obj => [obj.ext('cpp'), obj.ext('h')] do
-    sh "g++ -c -I/opt/local/include/ -I#{Dir.pwd} -o #{obj} #{obj.ext('cpp')}"
+    sh "g++ #{DEBUG_COMPILE ? '-g' : ''} -c -I/opt/local/include/ -I#{Dir.pwd} -o #{obj} #{obj.ext('cpp')}"
   end
 end
 
@@ -52,7 +54,7 @@ task :compile => SRC + SRC_HDRS + ['Makefile'] do
 end
 
 file "testrunner" => [:test_compile] + COMPILED_TESTS do
-  sh "g++ -L/opt/local/lib/ -o testrunner #{COMPILED_TESTS} #{COMPILED_SRC} -lruby -lcppunit"
+  sh "g++ #{DEBUG_COMPILE ? '-g' : ''} -L/opt/local/lib/ -o testrunner #{COMPILED_TESTS} #{COMPILED_SRC} -lruby -lcppunit"
 end
 
 task :test => "testrunner" do
@@ -64,7 +66,7 @@ task :test_compile => TEST_SRC + TEST_HDRS + [:compile]
 task :default => ["#{INTERFACE_NAME}_wrap.bundle"]
 
 file 'uct.o' do
-  sh "g++ -c -o uct.o uct.cpp"
+  sh "g++ #{DEBUG_COMPILE ? '-g' : ''} -c -o uct.o uct.cpp"
 end
 
 file "#{INTERFACE_NAME}_wrap.cxx" => ["#{INTERFACE_NAME}.cpp", "#{INTERFACE_NAME}.h", "#{INTERFACE_NAME}.i"] do

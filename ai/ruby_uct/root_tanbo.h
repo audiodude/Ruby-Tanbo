@@ -27,6 +27,10 @@
 #include "board_tanbo.h"
 #include "common.h"
 
+#include <vector>
+#include <list>
+#include <boost/shared_ptr.hpp>
+
 class RootTanbo {
 public:
   RootTanbo(Token init_color);
@@ -37,8 +41,8 @@ public:
   void associate_with(const BoardTanbo *board);
   
   Token color;
-  PointTanbo *points;
-  PointTanbo *liberties;
+  std::vector < boost::shared_ptr<PointTanbo> > points;
+  std::list < boost::shared_ptr<PointTanbo> > liberties;
 };
 
 #endif

@@ -27,24 +27,33 @@
 #include "board_tanbo.h"
 #include "common.h"
 
+#include <vector>
+#include <boost/shared_ptr.hpp>
+
 class BoardTanbo;
 class RootTanbo;
+class PointTanbo;
+
+typedef boost::shared_ptr<  std::vector< boost::shared_ptr<PointTanbo> >  > PointTanboVecPtr;
 
 class PointTanbo {
 public:
-  PointTanbo(int x, int y, BoardTanbo *board);
+  PointTanbo(int x, int y, boost::shared_ptr<BoardTanbo> board);
+  
+  bool operator==(const PointTanbo &other) const;
   
   bool in_bounds();
   bool blank() { return color == NOT_PLAYED; }
-  PointTanbo *bounded_neighbors();
+  PointTanboVecPtr bounded_neighbors();
   void print() const;
-  PointTanbo *deepcopy(BoardTanbo *board);
+  boost::shared_ptr<PointTanbo> deepcopy(boost::shared_ptr<BoardTanbo> board);
   
   int x;
   int y;
-  RootTanbo *root;
   Token color;
-  BoardTanbo *board;
+  boost::shared_ptr<RootTanbo> root;
+  boost::shared_ptr<BoardTanbo> board;
+  PointTanboVecPtr cached_neighbors;
 };
 
 #endif

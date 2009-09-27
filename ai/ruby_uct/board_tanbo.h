@@ -54,18 +54,30 @@ public:
   BoardTanbo();
   virtual ~BoardTanbo();
 
-  static bool in_bounds(const PointTanbo *point);
+  void starting_position();
+  
+  // Link the given point to the given root in both directions, and update the
+  // liberties of the root.
+  void add_point_to_root(boost::shared_ptr<PointTanbo> &point, boost::shared_ptr<RootTanbo> &root);
 
-  PointTanbo *at(int x, int y);
+  static bool in_bounds(const PointTanbo &point);
 
+  // Instantiate and return a vector of the neighbors of the given Point
+  boost::shared_ptr<  std::vector< boost::shared_ptr<PointTanbo> >  > BoardTanbo::bounded_neighbors(const PointTanbo &point);
+
+  boost::shared_ptr<PointTanbo> at(int x, int y);
+
+  // These are the functions defined in the super class
   virtual Board *deepcopy() const;
   virtual void print() const;
   inline virtual bool is_move_valid(const Move &move) const;
-  inline bool is_move_valid(const MoveTanbo &move) const;
+  inline bool is_move_valid(const MoveTanbo &move);
+  bool is_move_valid(const PointTanbo &move, Token color=NOT_PLAYED) const;
   virtual Moves get_possible_moves(Token player) const; //FIXME not sure about constness
   virtual void play_move(const Move &move);
   virtual bool play_random_move(Token player);
   virtual Token check_for_win() const;
+  // End superclass functions
 
   Token get_turn() const {
     return turn;
@@ -80,6 +92,7 @@ public:
   Token turn;
   std::vector < boost::shared_ptr<PointTanbo> > points;
   std::vector < boost::shared_ptr<RootTanbo> > roots;
+  boost::shared_ptr<BoardTanbo> me;
 };
 
 #endif
