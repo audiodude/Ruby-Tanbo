@@ -72,12 +72,20 @@ public:
   virtual void print() const;
   inline virtual bool is_move_valid(const Move &move) const;
   inline bool is_move_valid(const MoveTanbo &move);
-  bool is_move_valid(const PointTanbo &move, Token color=NOT_PLAYED) const;
   virtual Moves get_possible_moves(Token player) const; //FIXME not sure about constness
   virtual void play_move(const Move &move);
   virtual bool play_random_move(Token player);
   virtual Token check_for_win() const;
   // End superclass functions
+
+  // If the given point is adjacent to a single root of the given color, return
+  // that point. Otherwise, return null.
+  boost::shared_ptr<RootTanbo> get_adjacent_root(const PointTanbo &point, Token color);
+  // Find out if the move at a specified point is valid for a specified color. Uses
+  // the color of whoever's turn it is if NOT_PLAYED is specified.
+  bool is_move_valid(const PointTanbo &move, Token color=NOT_PLAYED);
+
+  void to_s();
 
   Token get_turn() const {
     return turn;

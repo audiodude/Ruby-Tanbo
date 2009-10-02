@@ -56,23 +56,23 @@ class PointTanbo;
 class RootTanbo;
 
 BoardTanbo::BoardTanbo() : turn(NOT_PLAYED), roots(), points(379), me(boost::shared_ptr<BoardTanbo>(this)) {
-  this->starting_position();  
+  this->starting_position();
   
   //allocate flat
   // flat=new Token[size];
   //   for (Token *iter=flat; iter!=flat+size; iter++) *iter=NOT_PLAYED;
   // 
   //   //allocate column pointer and playable move cache
-  //   tokens=new Token*[width];
-  //   token_for_columns=new Token*[width];
+  //   tokens=new Token*[19];
+  //   token_for_columns=new Token*[19];
   //   Size k=0;
-  //   for (Token *iter=flat; iter<flat+size; iter+=height) {
+  //   for (Token *iter=flat; iter<flat+size; iter+=19) {
   //     tokens[k]=iter;
-  //     token_for_columns[k]=iter+height-1;
+  //     token_for_columns[k]=iter+19-1;
   //     k++;
   //   }
   // 
-  //   assert(k==width);
+  //   assert(k==19);
 }
 
 BoardTanbo::~BoardTanbo() {
@@ -105,7 +105,11 @@ PointTanboVecPtr BoardTanbo::bounded_neighbors(const PointTanbo &point) {
 boost::shared_ptr<PointTanbo> BoardTanbo::at(const int x, const int y) {
   int index = x*20 + y;
   if(points[index].get() == 0) {
-    points[index].reset( new PointTanbo(x, y, me) );
+    PointTanbo *point = new PointTanbo(x, y, me);
+    if(y == 0 && x == 3) std::cout << "Point: [" << point->color << "]" << std::endl;
+    points[index].reset( point );
+  } else {
+    if(y == 0 && x == 3) std::cout << "Accessed point: [" << x << ", " << y << "]" << std::endl;
   }
   return points[index];
 }
@@ -179,7 +183,7 @@ void BoardTanbo::add_point_to_root(boost::shared_ptr<PointTanbo> &point, boost::
 }
 
 Board *BoardTanbo::deepcopy() const {
-  //     BoardTanbo *copy=new BoardTanbo(width,height,win_length);
+  //     BoardTanbo *copy=new BoardTanbo(19,19,win_length);
   // 
   //     //copy last move and played_count
   //     copy->lastmove=lastmove;
@@ -193,59 +197,118 @@ Board *BoardTanbo::deepcopy() const {
   //     }
   // 
   // //copy token_for_columns
-  //     for (int k=0; k<width; k++) {
+  //     for (int k=0; k<19; k++) {
   //         copy->token_for_columns[k]=copy->tokens[k]+(token_for_columns[k]-tokens[k]);
   //     }
   // 
   //     return copy;
 }
 
-void BoardTanbo::print() const {
-  // std::cout<<"  ";
-  //   for (Size column=0; column<width; column++) std::cout<<column;
-  //   std::cout<<std::endl;
-  // 
-  //   std::cout<<" +";
-  //   for (Size column=0; column<width; column++) std::cout<<"-";
-  //   std::cout<<"+"<<std::endl;
-  // 
-  //   for (Size row=0; row<height; row++) {
-  //     std::cout<<row<<"|";
-  //     for (Size column=0; column<width; column++) {
-  //       switch(tokens[column][row]) {
-  //       case NOT_PLAYED:
-  //         std::cout<<" ";
-  //         break;
-  //       case PLAYER_1:
-  //         std::cout<<"x";
-  //         break;
-  //       case PLAYER_2:
-  //         std::cout<<"o";
-  //         break;
-  //       }
-  //     }
-  //     std::cout<<"|"<<row<<std::endl;
-  //   }
-  // 
-  //   std::cout<<" +";
-  //   for (Size column=0; column<width; column++) std::cout<<"-";
-  //   std::cout<<"+"<<std::endl;
-  // 
-  //   std::cout<<"  ";
-  //   for (Size column=0; column<width; column++) std::cout<<column;
-  //   std::cout<<std::endl;
+void BoardTanbo::print() const{
+  // the at function is non-const, so this function doesn't do anything
 }
 
-bool BoardTanbo::is_move_valid(const Move &abstract_move) const {
+void BoardTanbo::to_s() {
+  std::cout<<std::endl<<"+";
+  for (int column=0; column<19; column++) std::cout<<"-";
+  std::cout<<"+"<<std::endl;
+
+  for (int row=0; row<19; row++) {
+    std::cout<<"|";
+    for (int column=0; column<19; column++) {
+      boost::shared_ptr<PointTanbo> point = this->at(row, column);
+      switch(point->color) {
+      case NOT_PLAYED:
+        std::cout<<".";
+        break;
+      case PLAYER_1:
+        std::cout<<"w";
+        break;
+      case PLAYER_2:
+        std::cout<<"b";
+        break;
+      default:
+      std::cout<<point->color;
+      }
+    }
+    std::cout<<"|"<<std::endl;
+  }
+
+  std::cout<<"+";
+  for (int column=0; column<19; column++) std::cout<<"-";
+  std::cout<<"+"<<std::endl;
+}
+
+boost::shared_ptr<RootTanbo> BoardTanbo::get_adjacent_root(const PointTanbo &point, Token color) {
+  bool adjacent = false;
+  boost::shared_ptr<RootTanbo> answer;
+  boost::shared_ptr<PointTanbo> adj_point;
+  
+  int x = point.x;
+  int y = point.y;
+  
+  if(x-1 >= 0) {  //Check the location to the west
+    boost::shared_ptr<PointTanbo> adj_point = this->at(x-1, y);
+    if(adj_point->color == color) {
+      // The west location is the same color as the queried location.
+      // For now, this is the answer, unless there are other adjacent
+      // pieces, in which case this ceases to be a valid move
+      answer = adj_point->root;
+      adjacent = true;
+    }
+  }
+  
+  if(y-1 >= 0) { //North location
+    adj_point = this->at(x, y-1);
+    if(adj_point->color == color) {
+      // This is the answer, unless we have already found an adajcent piece
+      if(adjacent) {
+        return boost::shared_ptr<RootTanbo>(); //Return null pointer
+      } else {
+        answer = adj_point->root;
+      }
+      adjacent = true;
+    }
+  }
+  
+  if(x+1 < 19) { //East location
+    adj_point = this->at(x+1, y);
+    if(adj_point->color == color) {
+      // Ditto
+      if(adjacent) {
+        return boost::shared_ptr<RootTanbo>(); //Return null pointer
+      } else {
+        answer = adj_point->root;
+      }
+      adjacent = true;
+    }
+  }
+  
+  if(y+1 < 19) { //South location
+    adj_point = this->at(x, y+1);
+    if(adj_point->color == color) {
+      // Ditto
+      if(adjacent) {
+        return boost::shared_ptr<RootTanbo>(); //Return null pointer
+      } else {
+        answer = adj_point->root;
+      }
+      adjacent = true;
+    }
+  }
+  
+  return answer;
+}
+
+inline bool BoardTanbo::is_move_valid(const Move &abstract_move) const {
   return is_move_valid(dynamic_cast<const MoveTanbo&>(abstract_move));
 }
 
 bool BoardTanbo::is_move_valid(const MoveTanbo &move) {
   return is_move_valid(*this->at(move.x, move.y));
-  // return move.player!=NOT_PLAYED and move.column>=0 and move.column<width and token_for_columns[move.column]>=tokens[move.column];
 }
 
-bool BoardTanbo::is_move_valid(const PointTanbo &point, Token color) const {
+bool BoardTanbo::is_move_valid(const PointTanbo &point, Token color) {
   if(! this->in_bounds(point)) {
     return false;
   }
@@ -265,68 +328,18 @@ bool BoardTanbo::is_move_valid(const PointTanbo &point, Token color) const {
     return false;
   }
   
-  // Implementation not finished, see commented out code below...
-  assert(false);
-  return false;
-  
-  // Factor this into get_adjacent_root() method...
-  // adjacent = false
-  // answer = nil
-  // if x-1 >= 0 #Check the location to the west
-  //  adj_point = self[x-1, y]
-  //  if adj_point.color == color
-  //    # The west location is the same color as the queried location.
-  //    # For now, this is the answer, unless there are other adjacent
-  //    # pieces, in which case this ceases to be a valid move
-  //    answer = adj_point
-  //    adjacent = true
-  //  end
-  // end
-  // if y-1 >= 0 #North location
-  //  adj_point = self[x, y-1]
-  //  if adj_point.color == color
-  //    # This is the answer, unless we have already found an adajcent piece
-  //    if adjacent
-  //      return nil
-  //    else
-  //      answer = adj_point
-  //    end
-  //    adjacent = true
-  //  end
-  // end
-  // if x+1 < 19 #East location
-  //  adj_point = self[x+1, y]
-  //  if adj_point.color == color
-  //    # Ditto
-  //    if adjacent
-  //      return nil
-  //    else
-  //      answer = adj_point
-  //    end
-  //    adjacent = true
-  //  end
-  // end
-  // if y+1 < 19 #South location
-  //  adj_point = self[x, y+1]
-  //  if adj_point.color == color
-  //    # Ditto
-  //    if adjacent
-  //      return nil
-  //    else
-  //      answer = adj_point
-  //    end
-  //    adjacent = true
-  //  end
-  // end
-  // 
-  // #puts "----#{point.inspect} -> #{answer.inspect}"
-  // return answer
+  boost::shared_ptr<RootTanbo> adj = this->get_adjacent_root(point, color);
+  if(adj) {  //If the pointer isn't null
+    return true;
+  } else {
+    return false;
+  }
 }
 
 Moves BoardTanbo::get_possible_moves(Token player) const {
   Moves moves;
   
-  // for (Size column=0; column<width; column++) {
+  // for (Size column=0; column<19; column++) {
   //  if (tokens[column]<=token_for_columns[column]) moves.push_back(new MoveTanbo(player,column));
   // }
 

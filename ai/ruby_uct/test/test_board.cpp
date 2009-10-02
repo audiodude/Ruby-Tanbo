@@ -16,7 +16,12 @@
 // along with this program. See the COPYING file. If not, see
 // <http://www.gnu.org/licenses/>.
 
+#include "common.h"
 #include "test_board.h"
+
+#include <boost/shared_ptr.hpp>
+
+#include <iostream>
 
 void BoardTest::test_black_starts() {
   CPPUNIT_ASSERT( PLAYER_1 == gameboard->get_turn() );
@@ -27,50 +32,49 @@ void BoardTest::test_right_root_number() {
 }
 
 void BoardTest::test_start_position() {
-  CPPUNIT_ASSERT( true );
-  // msg = "Starting position was found invalid, wrong moves for WHITE at: "
-  //  point = @gameboard[6, 0]
-  //  assert_equal TanboBoard::WHITE, @main_controller.get_color(point), (msg + point.inspect)
-  //  point = @gameboard[18, 0]
-  //  assert_equal TanboBoard::WHITE, @main_controller.get_color(point), (msg + point.inspect)
-  //  point = @gameboard[0, 6]
-  //  assert_equal TanboBoard::WHITE, @main_controller.get_color(point), (msg + point.inspect)
-  //  point = @gameboard[12, 6]
-  //  assert_equal TanboBoard::WHITE, @main_controller.get_color(point), (msg + point.inspect)
-  //  point = @gameboard[6, 12]
-  //  assert_equal TanboBoard::WHITE, @main_controller.get_color(point), (msg + point.inspect)
-  //  point = @gameboard[18, 12]
-  //  assert_equal TanboBoard::WHITE, @main_controller.get_color(point), (msg + point.inspect)
-  //  point = @gameboard[0, 18]
-  //  assert_equal TanboBoard::WHITE, @main_controller.get_color(point), (msg + point.inspect)
-  //  point = @gameboard[12, 18]
-  //  assert_equal TanboBoard::WHITE, @main_controller.get_color(point), (msg + point.inspect)
-  //             
-  //  msg = "Starting position was found invalid, wrong moves for BLACK at: "
-  //  point = @gameboard[0, 0]
-  //  assert_equal TanboBoard::BLACK, @main_controller.get_color(point), (msg + point.inspect)
-  //  point = @gameboard[12, 0]
-  //  assert_equal TanboBoard::BLACK, @main_controller.get_color(point), (msg + point.inspect)
-  //  point = @gameboard[6, 6]
-  //  assert_equal TanboBoard::BLACK, @main_controller.get_color(point), (msg + point.inspect)
-  //  point = @gameboard[18, 6]
-  //  assert_equal TanboBoard::BLACK, @main_controller.get_color(point), (msg + point.inspect)
-  //  point = @gameboard[12, 12]
-  //  assert_equal TanboBoard::BLACK, @main_controller.get_color(point), (msg + point.inspect)
-  //  point = @gameboard[18, 18]
-  //  assert_equal TanboBoard::BLACK, @main_controller.get_color(point), (msg + point.inspect)
-  //  point = @gameboard[6, 18]
-  //  assert_equal TanboBoard::BLACK, @main_controller.get_color(point), (msg + point.inspect)
-  //  point = @gameboard[0, 12]
-  //  assert_equal TanboBoard::BLACK, @main_controller.get_color(point), (msg + point.inspect)
-  // 
-  //  msg = "Starting position was found invalid, expected EMPTY point not empty at: "
-  //  0.upto(18) do |x|
-  //    0.upto(18) do |y|
-  //      unless x%6 == 0 && y%6 == 0
-  //        point = @gameboard[x, y]
-  //        assert_equal TanboBoard::BLANK, @main_controller.get_color(point), (msg + point.inspect)
-  //      end
-  //    end
-  //  end
+    // Starting positions for PLAYER_2 (white)
+    boost::shared_ptr<PointTanbo> point = gameboard->at(6, 0); 
+    CPPUNIT_ASSERT( PLAYER_2 == point->color );
+    point = gameboard->at(18, 0);
+    CPPUNIT_ASSERT( PLAYER_2 == point->color );
+    point = gameboard->at(0, 6);
+    CPPUNIT_ASSERT( PLAYER_2 == point->color );
+    point = gameboard->at(12, 6);
+    CPPUNIT_ASSERT( PLAYER_2 == point->color );
+    point = gameboard->at(6, 12);
+    CPPUNIT_ASSERT( PLAYER_2 == point->color );
+    point = gameboard->at(18, 12);
+    CPPUNIT_ASSERT( PLAYER_2 == point->color );
+    point = gameboard->at(0, 18);
+    CPPUNIT_ASSERT( PLAYER_2 == point->color );
+    point = gameboard->at(12, 18);
+    CPPUNIT_ASSERT( PLAYER_2 == point->color );
+             
+    // Starting positions for PLAYER_1 (black)
+    point = gameboard->at(0, 0);
+    CPPUNIT_ASSERT( PLAYER_1 == point->color );
+    point = gameboard->at(12, 0);
+    CPPUNIT_ASSERT( PLAYER_1 == point->color );
+    point = gameboard->at(6, 6);
+    CPPUNIT_ASSERT( PLAYER_1 == point->color );
+    point = gameboard->at(18, 6);
+    CPPUNIT_ASSERT( PLAYER_1 == point->color );
+    point = gameboard->at(12, 12);
+    CPPUNIT_ASSERT( PLAYER_1 == point->color );
+    point = gameboard->at(18, 18);
+    CPPUNIT_ASSERT( PLAYER_1 == point->color );
+    point = gameboard->at(6, 18);
+    CPPUNIT_ASSERT( PLAYER_1 == point->color );
+    point = gameboard->at(0, 12);
+    CPPUNIT_ASSERT( PLAYER_1 == point->color );
+
+   // Empty points (NOT_PLAYED)
+    for(int x=0; x<19; x++) {
+      for(int y=0; y<19; y++) {
+       if( x%6 != 0 || y%6 != 0) {
+         point = gameboard->at(x, y);
+         CPPUNIT_ASSERT( NOT_PLAYED == point->color );
+       }
+     }
+   }
 }

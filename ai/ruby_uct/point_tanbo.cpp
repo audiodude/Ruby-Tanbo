@@ -30,7 +30,7 @@
 class BoardTanbo;
 
 PointTanbo::PointTanbo(int the_x=-1, int the_y=-1, boost::shared_ptr<BoardTanbo> the_board=boost::make_shared<BoardTanbo>()) 
-  : x(the_x), y(the_y), board(the_board) {
+  : x(the_x), y(the_y), board(the_board), color(NOT_PLAYED) {
 }
 
 bool PointTanbo::operator==(const PointTanbo &other) const {
