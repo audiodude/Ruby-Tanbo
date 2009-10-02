@@ -27,13 +27,14 @@ require 'ai/uct/board.rb'
 class AIUlysses
   attr_reader :player
 
-  def initialize(color, name="Ulysses", max_sec=10, max_iteration=100, uct_constant=1)
+  def initialize(color, board_ui, name="Ulysses", max_sec=10, max_iteration=100, uct_constant=1)
     case color
       when TanboBoard::BLACK
         @player = UCT::Node::PLAYER_1
       when TanboBoard::WHITE
         @player = UCT::Node::PLAYER_2
     end
+    @board_ui = board_ui
     @name = name
     @max_sec = max_sec
     @max_iteration = max_iteration
@@ -48,6 +49,7 @@ class AIUlysses
     if $HEADLESS_MODE
       puts "Computing #{@name} move..."
     else
+        @board_ui.enable(false)
       begin_busy_cursor
     end
     puts "playing move" if $DEBUG_OUT
@@ -113,7 +115,8 @@ class AIUlysses
     if $HEADLESS_MODE
       puts "Making #{@name} move"
     else
-      end_busy_cursor 
+      end_busy_cursor
+      @board_ui.enable
     end
     return [move.x, move.y]
   end

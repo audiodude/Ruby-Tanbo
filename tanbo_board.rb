@@ -21,6 +21,7 @@ require 'observer'
 class TanboBoard
   include Observable
   
+  attr_reader :last_move
   attr_accessor :points, :turn, :roots, :modified
   
   BOARD_UPDATE_EVENT = -100
@@ -302,6 +303,7 @@ class TanboBoard
     
     # Set the give location to the current turn's color
     point.color = self.turn
+    @last_move = point
     
     # Switch turn control
     mover = self.turn

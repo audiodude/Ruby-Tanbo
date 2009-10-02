@@ -17,6 +17,9 @@ THANKS:
 
 CHANGES:
 
+1.1  (2009-10-01) - Visual refresh. White pieces are now white, and all
+    pieces are bigger. Red dot on the last placed piece.
+
 1.0  (2009-09-22) - The game is finished! Fixed Ulysses bug, and optimized
     code for 3x Ulysses performance improvement. Next stop, net play via GGZ!
 

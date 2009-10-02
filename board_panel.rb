@@ -28,7 +28,7 @@ class BoardPanel < Panel
   attr_reader :move_queue, :input_ready_cond
   
   def initialize(parent, controller)
-    super(parent, :size => [parent.get_client_size.get_width-20, parent.get_client_size.get_height/1.25])
+    super(parent, :size => [parent.get_client_size.get_width-20,parent.get_client_size.get_width-20])
     @controller = controller
     @move_queue = []
     @move_queue.extend(MonitorMixin)
@@ -143,10 +143,10 @@ class BoardPanel < Panel
             if @controller.get_board.turn == TanboBoard::BLACK
               dc.set_brush(BLACK_BRUSH)
             else
-              dc.set_brush(BG_BRUSH)
+              dc.set_brush(WHITE_BRUSH)
             end
         
-            dc.draw_circle(x_loc*w + x0, y_loc*h + y0, w/3)
+            dc.draw_circle(x_loc*w + x0, y_loc*h + y0, (w/2.05).to_i)
           }
         end
         @painting_mutex.unlock
@@ -217,6 +217,11 @@ class BoardPanel < Panel
     x0, y0 = get_origin
     
     board = @controller.get_board
+    if board.last_move
+      lastx, lasty = board.last_move.x, board.last_move.y
+    else
+      lastx, lasty = -1, -1
+    end
     0.upto 18 do |x|
       0.upto 18 do |y|
         c = board[x, y].color
@@ -224,11 +229,18 @@ class BoardPanel < Panel
           if c == TanboBoard::BLACK
             dc.set_brush(BLACK_BRUSH)
           elsif c == TanboBoard::WHITE
-            dc.set_brush(BG_BRUSH)
+            dc.set_brush(WHITE_BRUSH)
           else
             raise "Point: " + board[x, y] + " was unrecognized color: " + c
           end
-          dc.draw_circle(x*w + x0, y*h + y0, w/3)
+          dc.draw_circle(x*w + x0, y*h + y0, (w/2.05).to_i)
+          
+          if x == lastx && y == lasty
+            dc.set_brush(RED_BRUSH)
+            dc.set_pen(RED_PEN)
+            dc.draw_circle(x*w + x0, y*h + y0, (w/5.75).to_i)
+            dc.set_pen(BLACK_PEN)
+          end
         end
       end
     end

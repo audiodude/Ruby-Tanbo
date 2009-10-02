@@ -33,12 +33,12 @@ class MainFrame < Frame
   def initialize(controller)
     super(nil,  :title => "Tanbo", 
                 :pos => [100, 25],  
-                :size => [450, 640],
+                :size => [450, 550],
                 :style => DEFAULT_FRAME_STYLE | FULL_REPAINT_ON_RESIZE
     )
     @controller = controller
     
-    self.set_min_size([450,640])
+    self.set_min_size([450,550])
     
     @sizer = Wx::BoxSizer.new(VERTICAL)
     
@@ -175,9 +175,9 @@ class MainFrame < Frame
       when AISelectDialog::HUMAN
         return HumanPlayer.new(@board)
       when AISelectDialog::AI_RANDBO
-        return AIRandbo.new(@controller.get_board, color)
+        return AIRandbo.new(color, @board)
       when AISelectDialog::AI_ULYSSES
-        return AIUlysses.new(color)
+        return AIUlysses.new(color, @board)
     end
   end
   

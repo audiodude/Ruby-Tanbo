@@ -16,17 +16,34 @@
 # along with this program. See the COPYING file. If not, see
 # <http://www.gnu.org/licenses/>.
 
-require 'ai/ai_base.rb'
-
-class AIRandbo < AIBase
+class AIRandbo
+  
+  def initialize(color, board_ui)
+    @color = color
+    @board_ui = board_ui
+  end
+  
   def move(board, last_move)
-    begin_busy_cursor
-    return if game_over?
+    return if board.game_over?
     
-    moves = available_moves
+    if $HEADLESS_MODE
+      puts "Picking random move..."
+    else
+      @board_ui.enable(false)
+      begin_busy_cursor
+    end
+    
+    moves = board.get_all_moves(@color)
     return nil if moves.empty? #can't make a move if there are no moves to make!
     chosen = moves.keys[rand(moves.keys.size)]
-    end_busy_cursor
+    
+    if $HEADLESS_MODE
+      puts "Making move"
+    else
+      end_busy_cursor
+      @board_ui.enable
+    end
+    
     return [chosen.x, chosen.y]
   end
 end
