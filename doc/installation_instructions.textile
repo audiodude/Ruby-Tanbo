@@ -20,23 +20,24 @@ h2. Windows XP
 <a name="interaction"/>Sample Command shell interaction (USERNAME is your Windows XP user name, ie "john.smith" or "jsmithnumberone" or whatever):
 <pre>
 <code>
-        Microsoft Windows XP [Version 5.1.2600]
-        (C) Copyright 1985-2001 Microsoft Corp.
-        C:\Documents and Settings\USERNAME>gem install wxruby
-
-        Bulk updating Gem source index for: http://gems.rubyforge.org
-        Select which gem to install for your platform (i386-mswin32)
-         1. wxruby 2.0.1 (universal-darwin-9)
-         2. wxruby 2.0.1 (x86-mingw32)
-         3. wxruby 2.0.1 (x86-linux)
-         4. wxruby 2.0.1 (x86-mswin32-60)
-         5. Skip this gem
-         6. Cancel installation
-        > 4
-        Successfully installed wxruby-2.0.1-x86-mswin32-60
-        C:\Documents and Settings\USERNAME>
+      | Microsoft Windows XP [Version 5.1.2600]
+      | (C) Copyright 1985-2001 Microsoft Corp.
+      | C:\Documents and Settings\USERNAME>gem install wxruby
+      | 
+      | Bulk updating Gem source index for: http://gems.rubyforge.org
+      | Select which gem to install for your platform (i386-mswin32)
+      |  1. wxruby 2.0.1 (universal-darwin-9)
+      |  2. wxruby 2.0.1 (x86-mingw32)
+      |  3. wxruby 2.0.1 (x86-linux)
+      |  4. wxruby 2.0.1 (x86-mswin32-60)
+      |  5. Skip this gem
+      |  6. Cancel installation
+      | > 4
+      | Successfully installed wxruby-2.0.1-x86-mswin32-60
+      | C:\Documents and Settings\USERNAME>
 </code>
 </pre>
 
 h2. Mac OS X 10.5
 # Start with step 3 above, using /Applications/Utilities/Terminal.app to "sudo gem install wxruby".
+# Instead of double-clicking the Tanbo file, navigate to the directory where you extracted the files (using @cd Downloads@ or @cd Desktop@ or something similar) and use the command @ruby app.rb@  .
