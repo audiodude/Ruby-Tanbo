@@ -26,7 +26,7 @@ class MainController
   # The controller observes the gameboard, and everyone else observes the controller
   include Observable
   
-  attr_reader :roots
+  attr_reader :roots, :last_turn_time
   attr_accessor :player1, :player2
 
   RUN = 1
@@ -34,6 +34,7 @@ class MainController
   STOP = nil
 
   BOARD_READY_EVENT = -33
+  TURN_CHANGE_READY_EVENT = -58
 
   def initialize
     @run_mutex = Mutex.new
@@ -45,6 +46,8 @@ class MainController
   def reset!
     # The game board is a 19x19 2D grid of intersections (a Go board)
     @gameboard = TanboBoard.new
+    
+    @last_turn_time = 0
 
     @gameboard.add_observer(self)
 
@@ -98,8 +101,14 @@ class MainController
               next
           end
           
+          changed
+          notify_observers(TURN_CHANGE_READY_EVENT)
           if @gameboard.turn == TanboBoard::BLACK
+            start_time = Time.new.to_f
             next_move = @player1.move(@gameboard, last_move)
+            end_time = Time.new.to_f
+            
+            @last_turn_time = end_time - start_time
           else
             next_move = @player2.move(@gameboard, last_move)
           end

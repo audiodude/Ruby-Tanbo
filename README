@@ -16,6 +16,9 @@ THANKS:
   permission for anyone to code it!
 
 CHANGES:
+1.2  (2009-10-06) - Created a chime for when it's a human player's turn but 
+  the last turn was started over 6 seconds ago. There is currently no way to 
+  disable it, wait for 1.2.1!
 
 1.1  (2009-10-01) - Visual refresh. White pieces are now white, and all
     pieces are bigger. Red dot on the last placed piece.

@@ -40,6 +40,8 @@ class MainFrame < Frame
     
     self.set_min_size([450,550])
     
+    @snd_your_turn = Sound.new('./resources/your_turn.wav')
+    
     @sizer = Wx::BoxSizer.new(VERTICAL)
     
     @board = BoardPanel.new(self, @controller)
@@ -158,6 +160,19 @@ class MainFrame < Frame
         self.synchronize do
           @waiting_to_select_ai = false
         end
+      end
+    when MainController::TURN_CHANGE_READY_EVENT
+      if ( # See if it is now a human's turn
+          ( @controller.get_board.turn == TanboBoard::BLACK &&
+            @player1.is_a?(HumanPlayer) ) ||
+          ( @controller.get_board.turn == TanboBoard::WHITE &&
+                @player2.is_a?(HumanPlayer) )
+         )
+           if @controller.last_turn_time > 6 # We've waited more than 6 seconds
+             @snd_your_turn.play(SOUND_ASYNC) if @snd_your_turn.is_ok
+           else
+             puts @controller.last_turn_time
+           end
       end
     end
   end
