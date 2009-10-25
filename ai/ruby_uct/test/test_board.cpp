@@ -131,3 +131,33 @@ void BoardTest::test_root_points() {
         CPPUNIT_ASSERT( found.size() == 1 );
     }
 }
+
+void BoardTest::test_valid_move() {
+    // Test PLAYER2 (white) starting moves
+    boost::shared_ptr<PointTanbo> point = gameboard->at(0, 7);
+    CPPUNIT_ASSERT( gameboard->is_move_valid(*point, PLAYER_2) );
+    point = gameboard->at(0, 5);
+    CPPUNIT_ASSERT( gameboard->is_move_valid(*point, PLAYER_2) );
+    point = gameboard->at(1, 18);
+    CPPUNIT_ASSERT( gameboard->is_move_valid(*point, PLAYER_2) );
+    point = gameboard->at(0, 17);
+    CPPUNIT_ASSERT( gameboard->is_move_valid(*point, PLAYER_2) );
+    point = gameboard->at(5, 12);
+    CPPUNIT_ASSERT( gameboard->is_move_valid(*point, PLAYER_2) );
+    point = gameboard->at(6, 13);
+    CPPUNIT_ASSERT( gameboard->is_move_valid(*point, PLAYER_2) );
+  
+    // Test PLAYER1 (black) starting moves
+      point = gameboard->at(0, 1);
+    CPPUNIT_ASSERT( gameboard->is_move_valid(*point, PLAYER_1) );
+    point = gameboard->at(1, 0);
+    CPPUNIT_ASSERT( gameboard->is_move_valid(*point, PLAYER_1) );
+    point = gameboard->at(17, 18);
+    CPPUNIT_ASSERT( gameboard->is_move_valid(*point, PLAYER_1) );
+    point = gameboard->at(18, 17);
+    CPPUNIT_ASSERT( gameboard->is_move_valid(*point, PLAYER_1) );
+    point = gameboard->at(7, 6);
+    CPPUNIT_ASSERT( gameboard->is_move_valid(*point, PLAYER_1) );
+    point = gameboard->at(6, 7);
+    CPPUNIT_ASSERT( gameboard->is_move_valid(*point, PLAYER_1) );
+}

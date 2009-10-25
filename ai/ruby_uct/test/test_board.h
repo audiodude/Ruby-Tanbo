@@ -33,6 +33,7 @@ class BoardTest : public RubyTanboTest {
   CPPUNIT_TEST( test_black_starts );
   CPPUNIT_TEST( test_right_root_number );
   CPPUNIT_TEST( test_root_points );
+  CPPUNIT_TEST( test_valid_move );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -40,6 +41,7 @@ public:
   void test_right_root_number();
   void test_start_position();
   void test_root_points();
+  void test_valid_move();
 };
 
 // class BoardTest < Test::Unit::TestCase
@@ -47,35 +49,6 @@ public:
 // 
 // 
 // 
-//   def test_valid_move
-//     msg = "Valid WHITE starting move reported as invalid at: "
-//     point = @gameboard[0, 7]
-//     assert @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-//     point = @gameboard[0, 5]
-//     assert @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-//     point = @gameboard[1, 18]
-//     assert @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-//     point = @gameboard[0, 17]
-//     assert @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-//     point = @gameboard[5, 12]
-//     assert @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-//     point = @gameboard[6, 13]
-//     assert @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-//   
-//     msg = "Valid BLACK starting move reported as invalid at: "
-//     point = @gameboard[0, 1]
-//     assert @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-//     point = @gameboard[1, 0]
-//     assert @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-//     point = @gameboard[17, 18]
-//     assert @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-//     point = @gameboard[18, 17]
-//     assert @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-//     point = @gameboard[7, 6]
-//     assert @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-//     point = @gameboard[6, 7]
-//     assert @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-//   end
 // 
 //   def test_no_invalid_move
 //     msg = "Invalid move from starting position reported as valid at: "
