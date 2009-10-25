@@ -25,6 +25,7 @@
 
 #include <boost/make_shared.hpp>
 
+#include <iostream>
 #include <cassert>
 
 class BoardTanbo;
@@ -52,7 +53,7 @@ PointTanboVecPtr PointTanbo::bounded_neighbors() {
 }
 
 void PointTanbo::print() const {
-  assert(false);
+  std::cout << "[P:" << x << "," << y << "]";
 }
 
 boost::shared_ptr<PointTanbo> PointTanbo::deepcopy(boost::shared_ptr<BoardTanbo> board) {

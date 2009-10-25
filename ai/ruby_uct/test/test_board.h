@@ -32,12 +32,14 @@ class BoardTest : public RubyTanboTest {
   CPPUNIT_TEST( test_start_position );
   CPPUNIT_TEST( test_black_starts );
   CPPUNIT_TEST( test_right_root_number );
+  CPPUNIT_TEST( test_root_points );
   CPPUNIT_TEST_SUITE_END();
 
 public:
   void test_black_starts();
   void test_right_root_number();
   void test_start_position();
+  void test_root_points();
 };
 
 // class BoardTest < Test::Unit::TestCase
@@ -125,30 +127,6 @@ public:
 //     point = @gameboard[18,10]
 //     assert ! @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
 //     assert ! @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-//   end
-//   
-//   
-//   def test_root_points  
-//     root_points = [
-//       @gameboard[6 ,0 ], @gameboard[18,0 ],
-//       @gameboard[0 ,6 ], @gameboard[12,6 ],
-//       @gameboard[6 ,12], @gameboard[18,12],
-//       @gameboard[0 ,18], @gameboard[12,18],
-//       @gameboard[0 ,0 ], @gameboard[12,0 ],
-//       @gameboard[6 ,6 ], @gameboard[18,6 ],
-//       @gameboard[12,12], @gameboard[18,18],
-//       @gameboard[6 ,18], @gameboard[0 ,12]
-//     ]
-// 
-//     for point in root_points
-//       found = []
-//       for root in @gameboard.roots
-//         found << root if root.points.include?(point)
-//       end
-//       
-//       assert !found.empty?, "Couldn't find point in any root: " + point.inspect
-//       assert_equal 1, found.size, "More than one root had point: " + point.inspect
-//     end
 //   end
 //   
 //   def test_root_liberties

@@ -19,8 +19,13 @@
 #include "common.h"
 #include "test_board.h"
 
+#include "point_tanbo.h"
+#include "root_tanbo.h"
+
 #include <boost/shared_ptr.hpp>
 
+#include <vector>
+#include <algorithm>
 #include <iostream>
 
 void BoardTest::test_black_starts() {
@@ -77,4 +82,52 @@ void BoardTest::test_start_position() {
        }
      }
    }
+}
+
+void BoardTest::test_root_points() {
+    std::vector< boost::shared_ptr<PointTanbo> > root_points = std::vector< boost::shared_ptr<PointTanbo> >();
+    root_points.push_back(gameboard->at(6 ,0 ));
+    root_points.push_back(gameboard->at(18,0 ));
+    root_points.push_back(gameboard->at(0 ,6 ));
+    root_points.push_back(gameboard->at(12,6 ));
+    root_points.push_back(gameboard->at(6 ,12));
+    root_points.push_back(gameboard->at(18,12));
+    root_points.push_back(gameboard->at(0 ,18));
+    root_points.push_back(gameboard->at(12,18));
+    root_points.push_back(gameboard->at(0 ,0 ));
+    root_points.push_back(gameboard->at(12,0 ));
+    root_points.push_back(gameboard->at(6 ,6 ));
+    root_points.push_back(gameboard->at(18,6 ));
+    root_points.push_back(gameboard->at(12,12));
+    root_points.push_back(gameboard->at(18,18));
+    root_points.push_back(gameboard->at(6 ,18));
+    root_points.push_back(gameboard->at(0 ,12));
+
+    //Get the roots from the gameboard for iterating over
+    std::vector < boost::shared_ptr<RootTanbo> > the_roots = gameboard->roots;
+
+    for (std::vector< boost::shared_ptr<PointTanbo> >::iterator itr = root_points.begin(); itr != root_points.end(); ++itr ) {
+        boost::shared_ptr<PointTanbo> point = (*itr);
+        std::vector< boost::shared_ptr<PointTanbo> > found = std::vector< boost::shared_ptr<PointTanbo> >();
+      
+        //Find the point in the roots
+        for( std::vector< boost::shared_ptr<RootTanbo> >::iterator itr = the_roots.begin(); itr != the_roots.end(); ++itr ) {
+            boost::shared_ptr<RootTanbo> cur_root = (*itr);
+            std::vector< boost::shared_ptr<PointTanbo> > cur_points = cur_root->points;
+            
+            std::vector< boost::shared_ptr<PointTanbo> >::iterator found_point, search_start;
+            search_start = cur_points.begin();
+            while(true) {
+              found_point = std::find(search_start, cur_points.end(), point);
+              if(found_point == cur_points.end()) {
+                break;
+              }
+              found.push_back(*found_point);
+              search_start = found_point + 1;
+            }
+        }
+        
+        //Should have found the point in exactly one root
+        CPPUNIT_ASSERT( found.size() == 1 );
+    }
 }
