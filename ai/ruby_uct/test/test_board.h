@@ -34,6 +34,7 @@ class BoardTest : public RubyTanboTest {
   CPPUNIT_TEST( test_right_root_number );
   CPPUNIT_TEST( test_root_points );
   CPPUNIT_TEST( test_valid_move );
+  CPPUNIT_TEST( test_no_invalid_move );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -42,6 +43,7 @@ public:
   void test_start_position();
   void test_root_points();
   void test_valid_move();
+  void test_no_invalid_move();
 };
 
 // class BoardTest < Test::Unit::TestCase
@@ -50,57 +52,6 @@ public:
 // 
 // 
 // 
-//   def test_no_invalid_move
-//     msg = "Invalid move from starting position reported as valid at: "
-//     point = @gameboard[-1,-1]
-//     assert ! @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-//     assert ! @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-//     point = @gameboard[19,19]
-//     assert ! @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-//     assert ! @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-//     point = @gameboard[-1,19]
-//     assert ! @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-//     assert ! @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-//     point = @gameboard[19,-1]
-//     assert ! @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-//     assert ! @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-//     point = @gameboard[-532,1087]
-//     assert ! @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-//     assert ! @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-//     point = @gameboard[7734,-1985]
-//     assert ! @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-//     assert ! @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-//     point = @gameboard[3,4]
-//     assert ! @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-//     assert ! @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-//     point = @gameboard[4,4]
-//     assert ! @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-//     assert ! @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-//     point = @gameboard[5,4]
-//     assert ! @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-//     assert ! @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-//     point = @gameboard[9,0]
-//     assert ! @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-//     assert ! @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-//     point = @gameboard[0,10]
-//     assert ! @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-//     assert ! @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-//     point = @gameboard[10,0]
-//     assert ! @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-//     assert ! @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-//     point = @gameboard[0,18]
-//     assert ! @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-//     assert ! @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-//     point = @gameboard[6,6]
-//     assert ! @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-//     assert ! @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-//     point = @gameboard[10,18]
-//     assert ! @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-//     assert ! @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-//     point = @gameboard[18,10]
-//     assert ! @gameboard.valid_move?(point, TanboBoard::BLACK), (msg + point.inspect)
-//     assert ! @gameboard.valid_move?(point, TanboBoard::WHITE), (msg + point.inspect)
-//   end
 //   
 //   def test_root_liberties
 //     root_points = [

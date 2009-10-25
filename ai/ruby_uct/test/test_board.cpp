@@ -148,7 +148,7 @@ void BoardTest::test_valid_move() {
     CPPUNIT_ASSERT( gameboard->is_move_valid(*point, PLAYER_2) );
   
     // Test PLAYER1 (black) starting moves
-      point = gameboard->at(0, 1);
+    point = gameboard->at(0, 1);
     CPPUNIT_ASSERT( gameboard->is_move_valid(*point, PLAYER_1) );
     point = gameboard->at(1, 0);
     CPPUNIT_ASSERT( gameboard->is_move_valid(*point, PLAYER_1) );
@@ -160,4 +160,43 @@ void BoardTest::test_valid_move() {
     CPPUNIT_ASSERT( gameboard->is_move_valid(*point, PLAYER_1) );
     point = gameboard->at(6, 7);
     CPPUNIT_ASSERT( gameboard->is_move_valid(*point, PLAYER_1) );
+}
+
+void BoardTest::test_no_invalid_move() {  
+    boost::shared_ptr<PointTanbo> point = gameboard->at(19,19);
+    CPPUNIT_ASSERT( ! gameboard->is_move_valid(*point, PLAYER_1) );
+    CPPUNIT_ASSERT( ! gameboard->is_move_valid(*point, PLAYER_2) );
+    point = gameboard->at(19,-1);
+    CPPUNIT_ASSERT( ! gameboard->is_move_valid(*point, PLAYER_1) );
+    CPPUNIT_ASSERT( ! gameboard->is_move_valid(*point, PLAYER_2) );
+    point = gameboard->at(3,4);
+    CPPUNIT_ASSERT( ! gameboard->is_move_valid(*point, PLAYER_1) );
+    CPPUNIT_ASSERT( ! gameboard->is_move_valid(*point, PLAYER_2) );
+    point = gameboard->at(4,4);
+    CPPUNIT_ASSERT( ! gameboard->is_move_valid(*point, PLAYER_1) );
+    CPPUNIT_ASSERT( ! gameboard->is_move_valid(*point, PLAYER_2) );
+    point = gameboard->at(5,4);
+    CPPUNIT_ASSERT( ! gameboard->is_move_valid(*point, PLAYER_1) );
+    CPPUNIT_ASSERT( ! gameboard->is_move_valid(*point, PLAYER_2) );
+    point = gameboard->at(9,0);
+    CPPUNIT_ASSERT( ! gameboard->is_move_valid(*point, PLAYER_1) );
+    CPPUNIT_ASSERT( ! gameboard->is_move_valid(*point, PLAYER_2) );
+    point = gameboard->at(0,10);
+    CPPUNIT_ASSERT( ! gameboard->is_move_valid(*point, PLAYER_1) );
+    CPPUNIT_ASSERT( ! gameboard->is_move_valid(*point, PLAYER_2) );
+    point = gameboard->at(10,0);
+    CPPUNIT_ASSERT( ! gameboard->is_move_valid(*point, PLAYER_1) );
+    CPPUNIT_ASSERT( ! gameboard->is_move_valid(*point, PLAYER_2) );
+    point = gameboard->at(0,18);
+    CPPUNIT_ASSERT( ! gameboard->is_move_valid(*point, PLAYER_1) );
+    CPPUNIT_ASSERT( ! gameboard->is_move_valid(*point, PLAYER_2) );
+    point = gameboard->at(6,6);
+    CPPUNIT_ASSERT( ! gameboard->is_move_valid(*point, PLAYER_1) );
+    CPPUNIT_ASSERT( ! gameboard->is_move_valid(*point, PLAYER_2) );
+    point = gameboard->at(10,18);
+    CPPUNIT_ASSERT( ! gameboard->is_move_valid(*point, PLAYER_1) );
+    CPPUNIT_ASSERT( ! gameboard->is_move_valid(*point, PLAYER_2) );
+    point = gameboard->at(18,10);
+    CPPUNIT_ASSERT( ! gameboard->is_move_valid(*point, PLAYER_1) );
+    CPPUNIT_ASSERT( ! gameboard->is_move_valid(*point, PLAYER_2) );
 }
