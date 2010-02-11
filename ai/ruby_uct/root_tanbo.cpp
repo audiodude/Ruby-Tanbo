@@ -21,8 +21,13 @@
 // <http://www.gnu.org/licenses/>.
 
 #include "root_tanbo.h"
+#include "point_tanbo.h"
 
+#include <iostream>
 #include <cassert>
+#include <list>
+#include <vector>
+#include <boost/shared_ptr.hpp>
 
 RootTanbo::RootTanbo(Token init_color) : color(init_color) {
 }
@@ -37,7 +42,15 @@ bool RootTanbo::bounded() const {
 }
 
 void RootTanbo::print() const {
-  assert(false);
+  std::cout << "[R:" << std::endl << "  Pts:  ";
+  for(std::vector< boost::shared_ptr<PointTanbo> >::const_iterator itr = this->points.begin(); itr != this->points.end(); ++itr) {
+    (*(*itr)).print();
+  }
+  std::cout << std::endl << "  Libs:  ";
+  for(std::list< boost::shared_ptr<PointTanbo> >::const_iterator itr_1 = this->liberties.begin(); itr_1 != this->liberties.end(); ++itr_1) {
+    (*(*itr_1)).print();
+  }
+  std::cout << "]" << std::endl;
 }
 
 RootTanbo *RootTanbo::deepcopy(const BoardTanbo *board) {

@@ -18,6 +18,7 @@
 
 #include "ruby_uct_fixture.h"
 #include "test_board.h"
+#include "test_moves.h"
 #include "board.h"
 
 #include <cppunit/TestCase.h>
@@ -37,6 +38,7 @@ void RubyTanboTest::tearDown() {
 int main( int argc, char **argv) {
   CppUnit::TextUi::TestRunner runner;
   runner.addTest( BoardTest::suite() );
+  runner.addTest( MovesTest::suite() );
   runner.run();
   return 0;
 }

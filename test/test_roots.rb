@@ -30,7 +30,6 @@ class RootTest < Test::Unit::TestCase
       @gameboard[2, 12], @gameboard[1, 6], @gameboard[1, 12], @gameboard[1, 5], @gameboard[1, 11], @gameboard[0, 5], @gameboard[0, 11],
       @gameboard[1, 7], @gameboard[1, 13], @gameboard[0, 7]
     ]
-    require 'pp'
     do_move_sequence(seq)
     
     assert_equal TanboBoard::WHITE, @gameboard.turn, "Should be WHITE's turn after BLACK bounds WHITE root."

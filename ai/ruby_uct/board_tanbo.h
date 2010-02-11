@@ -32,18 +32,20 @@
 
 #include <cassert>
 
+class PointTanbo;
+
 class MoveTanbo : public Move {
 friend class BoardTanbo;
 public:
-  MoveTanbo(Token player, Size x, Size y);
+  MoveTanbo(Token player, Size x, Size y, boost::shared_ptr<PointTanbo> adj_point);
 
   virtual void print() const;
   virtual Move *deepcopy() const;
   virtual bool compare (const Move& move) const;
 
-private:
   Size x;
   Size y;
+  boost::shared_ptr<PointTanbo> adj_point;
 };
 
 class PointTanbo;
