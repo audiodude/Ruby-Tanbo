@@ -158,7 +158,7 @@ module UCT
           if winner == @move.player
             propagate_winning_to_granpa 
           else
-            propagate_loosing_to_daddy
+            propagate_losing_to_daddy
           end
 
           return winner

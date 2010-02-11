@@ -2,7 +2,7 @@ Ruby Tanbo: An implementation of the Mark Steere game Tanbo, using Ruby and
 wxRuby for the GUI.
 
 For more information on Tanbo, and the original rule set, see:
-http://www.marksteeregames.com/
+<http://www.marksteeregames.com/>
 
 USAGE:
   To run the program first install wxruby ('sudo gem install wxruby').
