@@ -19,6 +19,7 @@
 #include "ruby_uct_fixture.h"
 #include "test_board.h"
 #include "test_moves.h"
+#include "test_roots.h"
 #include "board.h"
 
 #include <cppunit/TestCase.h>
@@ -39,6 +40,7 @@ int main( int argc, char **argv) {
   CppUnit::TextUi::TestRunner runner;
   runner.addTest( BoardTest::suite() );
   runner.addTest( MovesTest::suite() );
+  runner.addTest( RootsTest::suite() );
   runner.run();
   return 0;
 }

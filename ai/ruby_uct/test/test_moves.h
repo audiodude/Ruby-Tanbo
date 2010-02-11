@@ -38,9 +38,4 @@ public:
   void test_move_effects();
 };
 
-// class MovesTest < Test::Unit::TestCase
-//   include RubyTanboTest
-// 
-// 
-// end
 #endif /* end of include guard: __TEST_MOVES__ */

@@ -19,10 +19,22 @@
 #ifndef __TEST_ROOTS__
 #define __TEST_ROOTS__
 
+#include "ruby_uct_fixture.h"
+
 #include <cppunit/TestCase.h>
 #include <cppunit/TestSuite.h>
 #include <cppunit/TestCaller.h>
 #include <cppunit/TestRunner.h>
+#include <cppunit/extensions/HelperMacros.h>
+
+class RootsTest : public RubyTanboTest {
+  CPPUNIT_TEST_SUITE( RootsTest );
+  CPPUNIT_TEST( test_simple_white_bounded );
+  CPPUNIT_TEST_SUITE_END();
+
+public:
+  void test_simple_white_bounded();
+};
 
 // class RootTest < Test::Unit::TestCase
 //   include RubyTanboTest
