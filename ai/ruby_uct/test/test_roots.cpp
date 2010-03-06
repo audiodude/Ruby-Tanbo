@@ -44,9 +44,10 @@ void RootsTest::test_simple_white_two_bounded() {
   seq.push_back(gameboard->at(5,  6)); seq.push_back(gameboard->at( 0,  5)); seq.push_back(gameboard->at(4 , 6));
   seq.push_back(gameboard->at(5,  0)); seq.push_back(gameboard->at( 3,  6)); seq.push_back(gameboard->at(11, 6));
   seq.push_back(gameboard->at(2,  6)); seq.push_back(gameboard->at(13, 18)); seq.push_back(gameboard->at(1, 6));
-  seq.push_back(gameboard->at(1,  5)); seq.push_back(gameboard->at(17,  0)); seq.push_back(gameboard->at(1, 4));
-  seq.push_back(gameboard->at(7,  0)); seq.push_back(gameboard->at( 0,  4));
-  
+  seq.push_back(gameboard->at(0, 17)); seq.push_back(gameboard->at( 1,  7)); seq.push_back(gameboard->at(5 , 12));
+  seq.push_back(gameboard->at(0,  7)); seq.push_back(gameboard->at(17, 12)); seq.push_back(gameboard->at(1,  5));
+  seq.push_back(gameboard->at(17, 0)); seq.push_back(gameboard->at( 1,  4)); seq.push_back(gameboard->at(7,  0));
+  seq.push_back(gameboard->at( 0,  4));
   
   do_move_sequence(seq, PLAYER_1);
 

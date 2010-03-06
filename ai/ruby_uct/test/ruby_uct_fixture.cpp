@@ -33,6 +33,8 @@
 
 #include <vector>
 
+
+#include <iostream>
 void RubyTanboTest::setUp() {
   gameboard = new BoardTanbo();
 }
@@ -46,6 +48,7 @@ void RubyTanboTest::do_move_sequence(std::vector< boost::shared_ptr<PointTanbo> 
   for (std::vector< boost::shared_ptr<PointTanbo> >::iterator itr = moves.begin(); itr != moves.end(); ++itr ) {
     boost::shared_ptr<PointTanbo> point = (*itr);
     boost::shared_ptr<PointTanbo> adj = gameboard->get_adjacent_point(*point, cur_color);
+    CPPUNIT_ASSERT( adj );
     MoveTanbo move = MoveTanbo(cur_color, point->x, point->y, adj);
     gameboard->play_move(move);
     cur_color = other_player(cur_color);

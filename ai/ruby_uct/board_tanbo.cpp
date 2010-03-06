@@ -105,7 +105,7 @@ PointTanboVecPtr BoardTanbo::bounded_neighbors(const PointTanbo &point) {
 boost::shared_ptr<PointTanbo> BoardTanbo::at(const int x, const int y) {
   int index = x*20 + y;
   assert (index >= 0 && index <= 399);
-  if(points[index].get() == 0) {
+  if(! points[index]) {
     PointTanbo *point = new PointTanbo(x, y, me);
     points[index].reset( point );
   }

@@ -30,10 +30,12 @@
 class RootsTest : public RubyTanboTest {
   CPPUNIT_TEST_SUITE( RootsTest );
   CPPUNIT_TEST( test_simple_white_bounded );
+  CPPUNIT_TEST( test_simple_white_two_bounded );
   CPPUNIT_TEST_SUITE_END();
 
 public:
   void test_simple_white_bounded();
+  void test_simple_white_two_bounded();
 };
 
 // class RootTest < Test::Unit::TestCase
