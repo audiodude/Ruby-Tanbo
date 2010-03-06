@@ -237,7 +237,7 @@ void BoardTest::test_no_invalid_move() {
               search_start = found_point + 1;
               
               //We found the root we're looking for (contains point)
-              PointTanboVecPtr bnd_neighbors = point->bounded_neighbors();
+              PointTanboVecPtr bnd_neighbors = gameboard->bounded_neighbors(*point);
               for( std::vector< boost::shared_ptr<PointTanbo> >::iterator itr = bnd_neighbors->begin(); itr != bnd_neighbors->end(); ++itr ) {
                 boost::shared_ptr<PointTanbo> cur_nbor = (*itr);
                 bool lib_found = false;

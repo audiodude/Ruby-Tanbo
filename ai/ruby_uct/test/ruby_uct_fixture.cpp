@@ -35,6 +35,8 @@
 
 void RubyTanboTest::setUp() {
   gameboard = new BoardTanbo();
+  gameboard->init();
+  gameboard->starting_position();
 }
 
 void RubyTanboTest::tearDown() {

@@ -30,14 +30,13 @@
 
 class BoardTanbo;
 
-PointTanbo::PointTanbo(int the_x=-1, int the_y=-1, boost::shared_ptr<BoardTanbo> the_board=boost::make_shared<BoardTanbo>()) 
-  : x(the_x), y(the_y), board(the_board), color(NOT_PLAYED) {
+PointTanbo::PointTanbo(int the_x=-1, int the_y=-1) 
+  : x(the_x), y(the_y), color(NOT_PLAYED) {
 }
 
 bool PointTanbo::operator==(const PointTanbo &other) const {
   if(this->x != other.x) return false;
   if(this->y != other.y) return false;
-  if( &(this->board) != &(other.board) ) return false;
   return true;
 }
 
@@ -45,18 +44,12 @@ bool PointTanbo::in_bounds() {
   return BoardTanbo::in_bounds(*this);
 }
 
-PointTanboVecPtr PointTanbo::bounded_neighbors() {
-  if (! cached_neighbors) {
-    cached_neighbors = board->bounded_neighbors(*this);
-  }
-  return cached_neighbors;
-}
-
 void PointTanbo::print() const {
   std::cout << "[P:" << x << "," << y << "]";
 }
 
-boost::shared_ptr<PointTanbo> PointTanbo::deepcopy(boost::shared_ptr<BoardTanbo> board) {
-  boost::shared_ptr<PointTanbo> copy = boost::make_shared<PointTanbo>(this->x, this->y, board);
+boost::shared_ptr<PointTanbo> PointTanbo::deepcopy() {
+  boost::shared_ptr<PointTanbo> copy = boost::make_shared<PointTanbo>(this->x, this->y);
+  copy->color = this->color;
   return copy;
 }

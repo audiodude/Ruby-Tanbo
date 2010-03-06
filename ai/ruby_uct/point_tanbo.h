@@ -38,22 +38,20 @@ typedef boost::shared_ptr<  std::vector< boost::shared_ptr<PointTanbo> >  > Poin
 
 class PointTanbo {
 public:
-  PointTanbo(int x, int y, boost::shared_ptr<BoardTanbo> board);
-  
+  PointTanbo(int x, int y);
+    
   bool operator==(const PointTanbo &other) const;
   
   bool in_bounds();
   bool blank() { return color == NOT_PLAYED; }
   PointTanboVecPtr bounded_neighbors();
   void print() const;
-  boost::shared_ptr<PointTanbo> deepcopy(boost::shared_ptr<BoardTanbo> board);
+  boost::shared_ptr<PointTanbo> deepcopy();
   
   int x;
   int y;
   Token color;
   boost::shared_ptr<RootTanbo> root;
-  boost::shared_ptr<BoardTanbo> board;
-  PointTanboVecPtr cached_neighbors;
 };
 
 #endif

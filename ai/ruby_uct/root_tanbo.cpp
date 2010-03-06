@@ -44,35 +44,49 @@ bool RootTanbo::bounded() const {
 }
 
 void RootTanbo::print() const {
+  assert(points.size());
+  assert(liberties.size());
   std::cout << "[R:" << std::endl << "  Pts:  ";
   for(std::vector< boost::shared_ptr<PointTanbo> >::const_iterator itr = this->points.begin(); itr != this->points.end(); ++itr) {
-    (*(*itr)).print();
+    boost::shared_ptr<PointTanbo> point = (*itr);
+    assert(point);
+    point->print();
   }
   std::cout << std::endl << "  Libs:  ";
   for(std::list< boost::shared_ptr<PointTanbo> >::const_iterator itr_1 = this->liberties.begin(); itr_1 != this->liberties.end(); ++itr_1) {
-    (*(*itr_1)).print();
+    boost::shared_ptr<PointTanbo> point = (*itr_1);
+    assert(point);
+    point->print();
   }
   std::cout << "]" << std::endl;
 }
 
-boost::shared_ptr<RootTanbo> RootTanbo::deepcopy(const boost::shared_ptr<BoardTanbo> board) {
+boost::shared_ptr<RootTanbo> RootTanbo::deepcopy(const BoardTanbo *board) {
 
   boost::shared_ptr<RootTanbo> copy = boost::make_shared<RootTanbo>(this->color);
 
-  std::vector < boost::shared_ptr<PointTanbo> > p_copy =
-    std::vector < boost::shared_ptr<PointTanbo> >(this->points.size());
-  std::list < boost::shared_ptr<PointTanbo> > l_copy =
-    std::list < boost::shared_ptr<PointTanbo> >(this->liberties.size());
+  copy->points = std::vector < boost::shared_ptr<PointTanbo> >(this->points.size());
+  copy->liberties = std::list < boost::shared_ptr<PointTanbo> >(this->liberties.size());
 
   for(std::vector< boost::shared_ptr<PointTanbo> >::const_iterator itr = this->points.begin(); itr != this->points.end(); ++itr) {
     boost::shared_ptr<PointTanbo> point = (*itr);
-    p_copy.push_back(board->at(point->x, point->y));
+    assert(point);
+    copy->points.push_back(board->at(point->x, point->y));
   }
 
   for(std::list< boost::shared_ptr<PointTanbo> >::const_iterator itr = this->liberties.begin(); itr != this->liberties.end(); ++itr) {
     boost::shared_ptr<PointTanbo> point = (*itr);
-    l_copy.push_back(board->at(point->x, point->y));
+    assert(point);
+    copy->liberties.push_back(board->at(point->x, point->y));
   }
+  
+  for(std::vector< boost::shared_ptr<PointTanbo> >::const_iterator itr = copy->points.begin(); itr != copy->points.end(); ++itr) {
+    boost::shared_ptr<PointTanbo> point = (*itr);
+    assert(point);
+    point->print();
+  }
+  
+  std::cout << copy->points.size() << " -- " << copy->liberties.size() << std::endl;
 
   return copy;
 }

@@ -55,7 +55,7 @@ class BoardTanbo : public Board {
 public:
   BoardTanbo();
   virtual ~BoardTanbo();
-
+  void init();
   void starting_position();
   
   // Link the given point to the given root in both directions, and update the
@@ -102,7 +102,6 @@ public:
   Token turn;
   std::vector < boost::shared_ptr<PointTanbo> > points;
   std::vector < boost::shared_ptr<RootTanbo> > roots;
-  boost::shared_ptr<BoardTanbo> me;
 };
 
 #endif

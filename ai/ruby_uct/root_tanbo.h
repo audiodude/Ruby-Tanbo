@@ -37,7 +37,7 @@ public:
   void remove_point(const boost::shared_ptr<PointTanbo> point);
   bool bounded() const;
   void print() const;
-  boost::shared_ptr<RootTanbo> deepcopy(const boost::shared_ptr<BoardTanbo> board);
+  boost::shared_ptr<RootTanbo> deepcopy(const BoardTanbo *board);
   
   Token color;
   std::vector < boost::shared_ptr<PointTanbo> > points;

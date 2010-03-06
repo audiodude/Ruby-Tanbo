@@ -55,33 +55,18 @@ bool MoveTanbo::compare (const Move& abstract_move) const {
 class PointTanbo;
 class RootTanbo;
 
-BoardTanbo::BoardTanbo() : turn(NOT_PLAYED), roots(), points(379), me(boost::shared_ptr<BoardTanbo>(this)) {
+BoardTanbo::BoardTanbo() : turn(NOT_PLAYED), roots(), points(379) {
+}
+
+void BoardTanbo::init() {
   int index;
   for(int x=0; x<19; x++) {
     for(int y=0; y<19; y++) {
       index = x*20 + y;
-      PointTanbo *point = new PointTanbo(x, y, me);
-      points[index].reset( point );
+      PointTanbo *point = new PointTanbo(x, y);
+      this->points[index].reset( point );
     }
   }
-  
-  this->starting_position();
-  
-  //allocate flat
-  // flat=new Token[size];
-  //   for (Token *iter=flat; iter!=flat+size; iter++) *iter=NOT_PLAYED;
-  // 
-  //   //allocate column pointer and playable move cache
-  //   tokens=new Token*[19];
-  //   token_for_columns=new Token*[19];
-  //   Size k=0;
-  //   for (Token *iter=flat; iter<flat+size; iter+=19) {
-  //     tokens[k]=iter;
-  //     token_for_columns[k]=iter+19-1;
-  //     k++;
-  //   }
-  // 
-  //   assert(k==19);
 }
 
 BoardTanbo::~BoardTanbo() {
@@ -114,7 +99,7 @@ PointTanboVecPtr BoardTanbo::bounded_neighbors(const PointTanbo &point) {
 boost::shared_ptr<PointTanbo> BoardTanbo::at(const int x, const int y) const{
   int index = x*20 + y;
   assert (index >= 0 && index <= 399);
-  return points[index];
+  return this->points[index];
 }
 
 void BoardTanbo::starting_position() {
@@ -173,7 +158,7 @@ void BoardTanbo::add_point_to_root(boost::shared_ptr<PointTanbo> &point, boost::
   
   // Check each neighbor. If it's a valid move, it's a liberty. Otherwise,
   // it's not (remove it in case it was previously).
-  PointTanboVecPtr bnded_nbs = point->bounded_neighbors();
+  PointTanboVecPtr bnded_nbs = this->bounded_neighbors(*point);
   
   for (std::vector< boost::shared_ptr<PointTanbo> >::iterator itr = bnded_nbs->begin(); itr != bnded_nbs->end(); ++itr ) {
     boost::shared_ptr<PointTanbo> pair = (*itr);
@@ -188,7 +173,7 @@ void BoardTanbo::add_point_to_root(boost::shared_ptr<PointTanbo> &point, boost::
 }
 
 Board *BoardTanbo::deepcopy() const {
-  boost::shared_ptr<BoardTanbo> copy = boost::make_shared<BoardTanbo>();
+  BoardTanbo *copy = new BoardTanbo();
   copy->turn = this->turn;
   
   for(int x=0; x<19; x++) {
@@ -196,23 +181,22 @@ Board *BoardTanbo::deepcopy() const {
       int index = x*20 + y;
       // Put a copy of each point, deep_copylicated using the new board, 
       // at all of the used indices
-      copy->points[index] = this->points[index]->deepcopy(copy);
+      copy->points[index] = this->points[index]->deepcopy();
     }
   }
   
-  std::vector < boost::shared_ptr<RootTanbo> > copied_roots =
-    std::vector< boost::shared_ptr<RootTanbo> >(this->roots.size());
+  copy->roots = std::vector< boost::shared_ptr<RootTanbo> >(this->roots.size());
   for (std::vector< boost::shared_ptr<RootTanbo> >::const_iterator itr = roots.begin(); itr != roots.end(); ++itr ) {
     boost::shared_ptr<RootTanbo> root = (*itr);
     boost::shared_ptr<RootTanbo> root_copy = root->deepcopy(copy);
+    root_copy->print();
+    copy->roots.push_back(root_copy);
   }
+  
+  return copy;
 }
 
 void BoardTanbo::print() const{
-  // the at function is non-const, so this function doesn't do anything
-}
-
-void BoardTanbo::to_s() {
   std::cout<<std::endl<<"+";
   for (int column=0; column<19; column++) std::cout<<"-";
   std::cout<<"+"<<std::endl;
@@ -346,6 +330,7 @@ Moves BoardTanbo::get_possible_moves(Token player) const {
   Moves moves = Moves();
   for (std::vector< boost::shared_ptr<RootTanbo> >::const_iterator itr = roots.begin(); itr != roots.end(); ++itr ) {
     boost::shared_ptr<RootTanbo> root = (*itr);
+    root->print();
     if(root->color != player) { continue; }
     for(std::list < boost::shared_ptr<PointTanbo> >::const_iterator itr2 = root->liberties.begin(); itr2 != root->liberties.end(); ++itr2) {
       boost::shared_ptr<PointTanbo> point = (*itr2);
@@ -440,6 +425,7 @@ void BoardTanbo::play_move(const Move &abstract_move) {
 bool BoardTanbo::play_random_move(Token player) {
   std::srand((unsigned) std::time(0));
   Moves m = this->get_possible_moves(player);
+  assert(m.size());
   int idx = std::rand() % m.size();
   Move *random_move;
   
