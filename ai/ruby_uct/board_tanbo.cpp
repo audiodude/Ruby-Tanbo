@@ -455,16 +455,26 @@ bool BoardTanbo::play_random_move(Token player) {
 }
 
 Token BoardTanbo::check_for_win() const {
-  //     Size column=lastmove.column;
-  //     Size row=token_for_columns[column]-tokens[column]+1;
-  // 
-  // assert(propagate(row,column,-1,0,lastmove.player)==1); //move up are never played
-  // 
-  //     if (propagate(row,column,1,0,lastmove.player)+1>win_length) return lastmove.player;
-  //     if (propagate(row,column,0,1,lastmove.player)+propagate(row,column,0,-1,lastmove.player)>win_length) return lastmove.player;
-  //     if (propagate(row,column,1,1,lastmove.player)+propagate(row,column,-1,-1,lastmove.player)>win_length) return lastmove.player;
-  //     if (propagate(row,column,1,-1,lastmove.player)+propagate(row,column,-1,1,lastmove.player)>win_length) return lastmove.player;
-
+  if(this->roots.size() == 1) {
+    return roots[0].color;
+  }
+  
+  // return nil unless @roots
+  // return @roots.first.color if @roots.size == 1
+  // winning_color = nil
+  // for root in @roots
+  //   if winning_color 
+  //     # There is no winner if we find a root with a different color than the
+  //     # first color
+  //     return nil if winning_color != root.color
+  //   else
+  //     # We haven't seen any colors yet. The first one we see is
+  //     # the potential winner
+  //     winning_color = root.color
+  //   end
+  // end
+  // # If we got here, every root in the array matches the color of the first root
+  // return winning_color
   return NOT_PLAYED;
 }
 
