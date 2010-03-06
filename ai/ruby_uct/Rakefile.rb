@@ -53,7 +53,7 @@ task :compile => SRC + SRC_HDRS + ['Makefile'] do
 end
 
 file "testrunner" => [:test_compile] + COMPILED_TESTS do
-  sh "g++ #{DEBUG_COMPILE ? '-g' : ''} -L/opt/local/lib/ -o testrunner #{COMPILED_TESTS} #{COMPILED_SRC} -lruby -lcppunit"
+  sh "g++ #{DEBUG_COMPILE ? '-g' : ''} -L/opt/local/lib/ -o testrunner #{COMPILED_SRC} #{COMPILED_TESTS} -lruby -lcppunit"
 end
 
 task :test => "testrunner" do

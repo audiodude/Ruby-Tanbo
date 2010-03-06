@@ -34,7 +34,7 @@
 class RootTanbo {
 public:
   RootTanbo(Token init_color);
-  void remove_point(const PointTanbo *point);
+  void remove_point(const boost::shared_ptr<PointTanbo> point);
   bool bounded() const;
   void print() const;
   RootTanbo *deepcopy(const BoardTanbo *board);

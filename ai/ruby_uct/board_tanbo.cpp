@@ -164,9 +164,7 @@ void BoardTanbo::add_point_to_root(boost::shared_ptr<PointTanbo> &point, boost::
   root->points.push_back(point);
   
   // Search and destroy! (remove the point from the root's liberties)
-  std::list< boost::shared_ptr<PointTanbo> >::iterator new_end;
-  new_end = std::remove(root->liberties.begin(), root->liberties.end(), point);
-  root->liberties.erase(new_end, root->liberties.end());
+  root->remove_point(point);
   
   // Check each neighbor. If it's a valid move, it's a liberty. Otherwise,
   // it's not (remove it in case it was previously).
@@ -177,6 +175,7 @@ void BoardTanbo::add_point_to_root(boost::shared_ptr<PointTanbo> &point, boost::
     if (this->is_move_valid(*pair, root->color)) {
       root->liberties.push_back(pair);
     } else {
+      std::list< boost::shared_ptr<PointTanbo> >::iterator new_end;
       new_end = std::remove(root->liberties.begin(), root->liberties.end(), pair);
       root->liberties.erase(new_end, root->liberties.end());
     }
@@ -223,10 +222,10 @@ void BoardTanbo::to_s() {
         std::cout<<".";
         break;
       case PLAYER_1:
-        std::cout<<"w";
+        std::cout<<"b";
         break;
       case PLAYER_2:
-        std::cout<<"b";
+        std::cout<<"w";
         break;
       default:
       std::cout<<point->color;
@@ -240,9 +239,9 @@ void BoardTanbo::to_s() {
   std::cout<<"+"<<std::endl;
 }
 
-boost::shared_ptr<RootTanbo> BoardTanbo::get_adjacent_root(const PointTanbo &point, Token color) {
+boost::shared_ptr<PointTanbo> BoardTanbo::get_adjacent_point(const PointTanbo &point, Token color) {
   bool adjacent = false;
-  boost::shared_ptr<RootTanbo> answer;
+  boost::shared_ptr<PointTanbo> answer;
   boost::shared_ptr<PointTanbo> adj_point;
   
   int x = point.x;
@@ -254,7 +253,7 @@ boost::shared_ptr<RootTanbo> BoardTanbo::get_adjacent_root(const PointTanbo &poi
       // The west location is the same color as the queried location.
       // For now, this is the answer, unless there are other adjacent
       // pieces, in which case this ceases to be a valid move
-      answer = adj_point->root;
+      answer = adj_point;
       adjacent = true;
     }
   }
@@ -264,9 +263,9 @@ boost::shared_ptr<RootTanbo> BoardTanbo::get_adjacent_root(const PointTanbo &poi
     if(adj_point->color == color) {
       // This is the answer, unless we have already found an adajcent piece
       if(adjacent) {
-        return boost::shared_ptr<RootTanbo>(); //Return null pointer
+        return boost::shared_ptr<PointTanbo>(); //Return null pointer
       } else {
-        answer = adj_point->root;
+        answer = adj_point;
       }
       adjacent = true;
     }
@@ -277,9 +276,9 @@ boost::shared_ptr<RootTanbo> BoardTanbo::get_adjacent_root(const PointTanbo &poi
     if(adj_point->color == color) {
       // Ditto
       if(adjacent) {
-        return boost::shared_ptr<RootTanbo>(); //Return null pointer
+        return boost::shared_ptr<PointTanbo>(); //Return null pointer
       } else {
-        answer = adj_point->root;
+        answer = adj_point;
       }
       adjacent = true;
     }
@@ -290,9 +289,9 @@ boost::shared_ptr<RootTanbo> BoardTanbo::get_adjacent_root(const PointTanbo &poi
     if(adj_point->color == color) {
       // Ditto
       if(adjacent) {
-        return boost::shared_ptr<RootTanbo>(); //Return null pointer
+        return boost::shared_ptr<PointTanbo>(); //Return null pointer
       } else {
-        answer = adj_point->root;
+        answer = adj_point;
       }
       adjacent = true;
     }
@@ -331,7 +330,7 @@ bool BoardTanbo::is_move_valid(const PointTanbo &point, Token color) {
   }
   
   // Valid moves are adjacent to a root
-  boost::shared_ptr<RootTanbo> adj = this->get_adjacent_root(point, color);
+  boost::shared_ptr<PointTanbo> adj = this->get_adjacent_point(point, color);
   if(adj) {  //If the pointer isn't null
     return true;
   } else {
@@ -349,6 +348,15 @@ Moves BoardTanbo::get_possible_moves(Token player) const {
   return moves;
 }
 
+// Convenience method to remove all of the pieces from the board that are
+// in the given root, setting their color to NOT_PLAYED
+inline void remove_root_pieces(const boost::shared_ptr<RootTanbo> root) {
+  for(std::vector < boost::shared_ptr<PointTanbo> >::iterator itr = root->points.begin(); itr != root->points.end(); ++itr) {
+    boost::shared_ptr<PointTanbo> point = (*itr);
+    point->color = NOT_PLAYED;
+  }
+}
+
 void BoardTanbo::play_move(const Move &abstract_move) {
   const MoveTanbo &move=dynamic_cast<const MoveTanbo&>(abstract_move);
   
@@ -356,8 +364,68 @@ void BoardTanbo::play_move(const Move &abstract_move) {
   point->color = turn;
   turn = other_player(turn);
   
+  // Add the point to the root, which causes the root's "valid moves" to be
+  // recalculated
   boost::shared_ptr<RootTanbo> cur_root = move.adj_point->root;
   this->add_point_to_root(point, cur_root);
+  
+  // Get the new piece's neighbor's neighbors. If they contain roots,
+  // let those roots recalculate if their liberties are still valid.
+  PointTanboVecPtr neighbors = this->bounded_neighbors(*point);
+  for (std::vector< boost::shared_ptr<PointTanbo> >::iterator itr = neighbors->begin(); itr != neighbors->end(); ++itr ) {
+    boost::shared_ptr<PointTanbo> neighbor = (*itr);
+    // Skip the neighbor that allowed us to place the piece, and any
+    // non-empty points. The status of filled points doesn't change
+    // by placing a piece.
+    if((*neighbor) == (*move.adj_point) || neighbor->color != NOT_PLAYED) { continue; }
+    
+    PointTanboVecPtr neighbors_neighbors = this->bounded_neighbors(*neighbor);
+    for (std::vector< boost::shared_ptr<PointTanbo> >::iterator itr_1 = neighbors_neighbors->begin();
+         itr_1 != neighbors_neighbors->end(); ++itr_1 ) {
+      boost::shared_ptr<PointTanbo> next_neighbor = (*itr_1);
+      boost::shared_ptr<RootTanbo> next_root = next_neighbor->root;
+      if(next_root && next_root != cur_root && next_root->color == cur_root->color) {
+        // There is a root next to one of the new pieces neighbors, and it is
+        // the same color as the root of this piece. That neighbor, therefore,
+        // is no longer a liberty for that root.
+        next_root->remove_point(neighbor);
+      }
+    }
+  }
+
+  // Now check every root
+  std::vector< boost::shared_ptr<RootTanbo> > other_bounded = std::vector< boost::shared_ptr<RootTanbo> >();
+  for (std::vector< boost::shared_ptr<RootTanbo> >::iterator itr = roots.begin(); itr != roots.end(); ++itr ) {  
+    boost::shared_ptr<RootTanbo> root = (*itr);
+    //The current move is no longer a valid liberty of any root
+    root->remove_point(point);
+    
+    // If the root has become bounded, keep track of it.
+    if(root->bounded() && root != cur_root) {
+      other_bounded.push_back(root);
+    }
+  }
+  
+  // If the current root is bounded, remove all of it's pieces and delete it
+  // from the list of roots (effectively removing it from the board)
+  if(cur_root->bounded()) {
+    remove_root_pieces(cur_root);
+    // Remove the root
+    std::vector< boost::shared_ptr<RootTanbo> >::iterator new_end;
+    new_end = std::remove(this->roots.begin(), this->roots.end(), cur_root);
+    this->roots.erase(new_end, this->roots.end());
+  } else {
+    if(false == other_bounded.empty()) {
+        for (std::vector< boost::shared_ptr<RootTanbo> >::iterator itr = other_bounded.begin(); itr != other_bounded.end(); ++itr ) {
+        boost::shared_ptr<RootTanbo> root = (*itr);
+        remove_root_pieces(root);        
+        //Remove the root
+        std::vector< boost::shared_ptr<RootTanbo> >::iterator new_end;
+        new_end = std::remove(this->roots.begin(), this->roots.end(), root);
+        this->roots.erase(new_end, this->roots.end());
+      }
+    }
+  }
 }
 
 bool BoardTanbo::play_random_move(Token player) {

@@ -32,6 +32,7 @@ protected:
 public:
   virtual void setUp();
   virtual void tearDown();
+  void do_move_sequence(std::vector< boost::shared_ptr<PointTanbo> > &moves, Token starting_color);
 };
 
 #endif /* end of include guard: __RUBY_UCT_FIXTURE__ */

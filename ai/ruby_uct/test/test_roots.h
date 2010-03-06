@@ -39,34 +39,6 @@ public:
 // class RootTest < Test::Unit::TestCase
 //   include RubyTanboTest
 // 
-//   def test_simple_white_bounded
-//     seq = [
-//       @gameboard[5, 6], @gameboard[5, 12], @gameboard[4, 6], @gameboard[4, 12], @gameboard[3, 6], @gameboard[3, 12], @gameboard[2, 6],
-//       @gameboard[2, 12], @gameboard[1, 6], @gameboard[1, 12], @gameboard[1, 5], @gameboard[1, 11], @gameboard[0, 5], @gameboard[0, 11],
-//       @gameboard[1, 7], @gameboard[1, 13], @gameboard[0, 7]
-//     ]
-//     require 'pp'
-//     do_move_sequence(seq)
-//     
-//     assert_equal TanboBoard::WHITE, @gameboard.turn, "Should be WHITE's turn after BLACK bounds WHITE root."
-//     assert_equal TanboBoard::BLANK, @main_controller.get_color(@gameboard[0, 6]), "Square containing removed root should be BLANK."
-//     
-//     black_points = [
-//       @gameboard[5, 6], @gameboard[4, 6], @gameboard[3, 6], @gameboard[2, 6], @gameboard[1, 6], @gameboard[1, 5], @gameboard[0, 5], @gameboard[1, 7], @gameboard[0, 7]  
-//     ]
-//     msg = "Expected point to be BLACK after black move sequence at: "
-//     for point in black_points
-//       assert_equal TanboBoard::BLACK, @main_controller.get_color(point), (msg + point.inspect)
-//     end
-//     
-//     white_points = [
-//       @gameboard[5, 12], @gameboard[4, 12], @gameboard[3, 12], @gameboard[2, 12], @gameboard[1, 12], @gameboard[1, 11], @gameboard[0, 11], @gameboard[1, 13]
-//     ]
-//     msg = "Expected point to be WHITE after white move sequence at: "
-//     for point in white_points
-//       assert_equal TanboBoard::WHITE, @main_controller.get_color(point), (msg + point.inspect)
-//     end
-//   end
 //   
 //   def test_simple_white_two_bounded
 //     seq = [

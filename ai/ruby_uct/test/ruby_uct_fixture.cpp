@@ -20,6 +20,9 @@
 #include "test_board.h"
 #include "test_moves.h"
 #include "test_roots.h"
+
+#include "board_tanbo.h"
+#include "common.h"
 #include "board.h"
 
 #include <cppunit/TestCase.h>
@@ -28,12 +31,25 @@
 #include <cppunit/TestRunner.h>
 #include <cppunit/ui/text/TestRunner.h>
 
+#include <vector>
+
 void RubyTanboTest::setUp() {
   gameboard = new BoardTanbo();
 }
 
 void RubyTanboTest::tearDown() {
   delete gameboard;
+}
+
+void RubyTanboTest::do_move_sequence(std::vector< boost::shared_ptr<PointTanbo> > &moves, Token starting_color) {
+  Token cur_color = starting_color;
+  for (std::vector< boost::shared_ptr<PointTanbo> >::iterator itr = moves.begin(); itr != moves.end(); ++itr ) {
+    boost::shared_ptr<PointTanbo> point = (*itr);
+    boost::shared_ptr<PointTanbo> adj = gameboard->get_adjacent_point(*point, cur_color);
+    MoveTanbo move = MoveTanbo(cur_color, point->x, point->y, adj);
+    gameboard->play_move(move);
+    cur_color = other_player(cur_color);
+  }
 }
 
 int main( int argc, char **argv) {

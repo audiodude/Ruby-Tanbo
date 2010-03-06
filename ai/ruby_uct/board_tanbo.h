@@ -80,9 +80,9 @@ public:
   virtual Token check_for_win() const;
   // End superclass functions
 
-  // If the given point is adjacent to a single root of the given color, return
+  // If the given point is adjacent to a single piece of the given color, return
   // that point. Otherwise, return null.
-  boost::shared_ptr<RootTanbo> get_adjacent_root(const PointTanbo &point, Token color);
+  boost::shared_ptr<PointTanbo> get_adjacent_point(const PointTanbo &point, Token color);
   // Find out if the move at a specified point is valid for a specified color. Uses
   // the color of whoever's turn it is if NOT_PLAYED is specified.
   bool is_move_valid(const PointTanbo &move, Token color=NOT_PLAYED);

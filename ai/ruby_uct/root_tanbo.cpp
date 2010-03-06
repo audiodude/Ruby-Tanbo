@@ -32,13 +32,14 @@
 RootTanbo::RootTanbo(Token init_color) : color(init_color) {
 }
 
-void RootTanbo::remove_point(const PointTanbo *point) {
-  assert(false);
+void RootTanbo::remove_point(const boost::shared_ptr<PointTanbo> point) {
+  std::list< boost::shared_ptr<PointTanbo> >::iterator new_end;
+  new_end = std::remove(liberties.begin(), liberties.end(), point);
+  liberties.erase(new_end, liberties.end());
 }
 
 bool RootTanbo::bounded() const {
-  assert(false);
-  return false;
+  return liberties.empty();
 }
 
 void RootTanbo::print() const {

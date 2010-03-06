@@ -301,7 +301,7 @@ class TanboBoard
       raise "Could not find root for pt: " + adj.inspect 
     end
     
-    # Set the give location to the current turn's color
+    # Set the given location to the current turn's color
     point.color = self.turn
     @last_move = point
     
