@@ -200,22 +200,12 @@ Board *BoardTanbo::deepcopy() const {
     }
   }
   
-  // copy.turn = @turn
-  // 
-  // @points.each_with_index do |val, i|
-  //   next unless val
-  //   # Put a copy of each point, deep_copylicated using the new board, at all of the
-  //   # used indices
-  //   copy.points[i] = val.deep_copy(copy)
-  // end
-  // 
-  // copy.roots = @roots.dup
-  // # puts @roots.size.to_s + " " + @roots.compact.size.to_s
-  // copy.roots.map! do |root|
-  //   root.deep_copy(copy)
-  // end
-  // 
-  // return copy
+  std::vector < boost::shared_ptr<RootTanbo> > copied_roots =
+    std::vector< boost::shared_ptr<RootTanbo> >(this->roots.size());
+  for (std::vector< boost::shared_ptr<RootTanbo> >::const_iterator itr = roots.begin(); itr != roots.end(); ++itr ) {
+    boost::shared_ptr<RootTanbo> root = (*itr);
+    boost::shared_ptr<RootTanbo> root_copy = root->deepcopy(copy);
+  }
 }
 
 void BoardTanbo::print() const{

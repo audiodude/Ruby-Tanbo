@@ -28,6 +28,7 @@
 #include <list>
 #include <vector>
 #include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 
 RootTanbo::RootTanbo(Token init_color) : color(init_color) {
 }
@@ -54,13 +55,24 @@ void RootTanbo::print() const {
   std::cout << "]" << std::endl;
 }
 
-RootTanbo *RootTanbo::deepcopy(const BoardTanbo *board) {
-  assert(false);
-  return new RootTanbo(this->color);
-}
+boost::shared_ptr<RootTanbo> RootTanbo::deepcopy(const boost::shared_ptr<BoardTanbo> board) {
 
-void RootTanbo::associate_with(const BoardTanbo *board) {
-  assert(false);
-}
-  
+  boost::shared_ptr<RootTanbo> copy = boost::make_shared<RootTanbo>(this->color);
 
+  std::vector < boost::shared_ptr<PointTanbo> > p_copy =
+    std::vector < boost::shared_ptr<PointTanbo> >(this->points.size());
+  std::list < boost::shared_ptr<PointTanbo> > l_copy =
+    std::list < boost::shared_ptr<PointTanbo> >(this->liberties.size());
+
+  for(std::vector< boost::shared_ptr<PointTanbo> >::const_iterator itr = this->points.begin(); itr != this->points.end(); ++itr) {
+    boost::shared_ptr<PointTanbo> point = (*itr);
+    p_copy.push_back(board->at(point->x, point->y));
+  }
+
+  for(std::list< boost::shared_ptr<PointTanbo> >::const_iterator itr = this->liberties.begin(); itr != this->liberties.end(); ++itr) {
+    boost::shared_ptr<PointTanbo> point = (*itr);
+    l_copy.push_back(board->at(point->x, point->y));
+  }
+
+  return copy;
+}
