@@ -33,8 +33,6 @@
 
 #include <vector>
 
-
-#include <iostream>
 void RubyTanboTest::setUp() {
   gameboard = new BoardTanbo();
 }

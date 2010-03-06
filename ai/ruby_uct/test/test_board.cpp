@@ -163,14 +163,8 @@ void BoardTest::test_valid_move() {
     CPPUNIT_ASSERT( gameboard->is_move_valid(*point, PLAYER_1) );
 }
 
-void BoardTest::test_no_invalid_move() {  
-    boost::shared_ptr<PointTanbo> point = gameboard->at(19,19);
-    CPPUNIT_ASSERT( ! gameboard->is_move_valid(*point, PLAYER_1) );
-    CPPUNIT_ASSERT( ! gameboard->is_move_valid(*point, PLAYER_2) );
-    point = gameboard->at(19,-1);
-    CPPUNIT_ASSERT( ! gameboard->is_move_valid(*point, PLAYER_1) );
-    CPPUNIT_ASSERT( ! gameboard->is_move_valid(*point, PLAYER_2) );
-    point = gameboard->at(3,4);
+void BoardTest::test_no_invalid_move() {
+    boost::shared_ptr<PointTanbo> point = gameboard->at(3,4);
     CPPUNIT_ASSERT( ! gameboard->is_move_valid(*point, PLAYER_1) );
     CPPUNIT_ASSERT( ! gameboard->is_move_valid(*point, PLAYER_2) );
     point = gameboard->at(4,4);

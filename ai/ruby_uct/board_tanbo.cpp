@@ -56,6 +56,15 @@ class PointTanbo;
 class RootTanbo;
 
 BoardTanbo::BoardTanbo() : turn(NOT_PLAYED), roots(), points(379), me(boost::shared_ptr<BoardTanbo>(this)) {
+  int index;
+  for(int x=0; x<19; x++) {
+    for(int y=0; y<19; y++) {
+      index = x*20 + y;
+      PointTanbo *point = new PointTanbo(x, y, me);
+      points[index].reset( point );
+    }
+  }
+  
   this->starting_position();
   
   //allocate flat
@@ -102,13 +111,9 @@ PointTanboVecPtr BoardTanbo::bounded_neighbors(const PointTanbo &point) {
   }
 }
 
-boost::shared_ptr<PointTanbo> BoardTanbo::at(const int x, const int y) {
+boost::shared_ptr<PointTanbo> BoardTanbo::at(const int x, const int y) const{
   int index = x*20 + y;
   assert (index >= 0 && index <= 399);
-  if(! points[index]) {
-    PointTanbo *point = new PointTanbo(x, y, me);
-    points[index].reset( point );
-  }
   return points[index];
 }
 
@@ -183,25 +188,34 @@ void BoardTanbo::add_point_to_root(boost::shared_ptr<PointTanbo> &point, boost::
 }
 
 Board *BoardTanbo::deepcopy() const {
-  //     BoardTanbo *copy=new BoardTanbo(19,19,win_length);
+  boost::shared_ptr<BoardTanbo> copy = boost::make_shared<BoardTanbo>();
+  copy->turn = this->turn;
+  
+  for(int x=0; x<19; x++) {
+    for(int y=0; y<19; y++) {
+      int index = x*20 + y;
+      // Put a copy of each point, deep_copylicated using the new board, 
+      // at all of the used indices
+      copy->points[index] = this->points[index]->deepcopy(copy);
+    }
+  }
+  
+  // copy.turn = @turn
   // 
-  //     //copy last move and played_count
-  //     copy->lastmove=lastmove;
-  //     copy->played_count=played_count;
+  // @points.each_with_index do |val, i|
+  //   next unless val
+  //   # Put a copy of each point, deep_copylicated using the new board, at all of the
+  //   # used indices
+  //   copy.points[i] = val.deep_copy(copy)
+  // end
   // 
-  // //copy flat
-  //     const Token *current_iter=flat;
-  // for (Token *iter=copy->flat; iter!=copy->flat+size; iter++) {
-  //         *iter=*current_iter;
-  //         current_iter++;
-  //     }
+  // copy.roots = @roots.dup
+  // # puts @roots.size.to_s + " " + @roots.compact.size.to_s
+  // copy.roots.map! do |root|
+  //   root.deep_copy(copy)
+  // end
   // 
-  // //copy token_for_columns
-  //     for (int k=0; k<19; k++) {
-  //         copy->token_for_columns[k]=copy->tokens[k]+(token_for_columns[k]-tokens[k]);
-  //     }
-  // 
-  //     return copy;
+  // return copy
 }
 
 void BoardTanbo::print() const{
@@ -239,7 +253,7 @@ void BoardTanbo::to_s() {
   std::cout<<"+"<<std::endl;
 }
 
-boost::shared_ptr<PointTanbo> BoardTanbo::get_adjacent_point(const PointTanbo &point, Token color) {
+boost::shared_ptr<PointTanbo> BoardTanbo::get_adjacent_point(const PointTanbo &point, Token color) const {
   bool adjacent = false;
   boost::shared_ptr<PointTanbo> answer;
   boost::shared_ptr<PointTanbo> adj_point;
@@ -339,12 +353,17 @@ bool BoardTanbo::is_move_valid(const PointTanbo &point, Token color) {
 }
 
 Moves BoardTanbo::get_possible_moves(Token player) const {
-  Moves moves;
-  
-  // for (Size column=0; column<19; column++) {
-  //  if (tokens[column]<=token_for_columns[column]) moves.push_back(new MoveTanbo(player,column));
-  // }
-
+  Moves moves = Moves();
+  for (std::vector< boost::shared_ptr<RootTanbo> >::const_iterator itr = roots.begin(); itr != roots.end(); ++itr ) {
+    boost::shared_ptr<RootTanbo> root = (*itr);
+    if(root->color != player) { continue; }
+    for(std::list < boost::shared_ptr<PointTanbo> >::const_iterator itr2 = root->liberties.begin(); itr2 != root->liberties.end(); ++itr2) {
+      boost::shared_ptr<PointTanbo> point = (*itr2);
+      boost::shared_ptr<PointTanbo> adj = this->get_adjacent_point(*point, player);
+      MoveTanbo *next_move = new MoveTanbo(player, point->x, point->y, adj);
+      moves.push_back(next_move);
+    }
+  }
   return moves;
 }
 
@@ -429,52 +448,48 @@ void BoardTanbo::play_move(const Move &abstract_move) {
 }
 
 bool BoardTanbo::play_random_move(Token player) {
-  return false;
-  // if (played_count<size) {
-  //  Moves possible_moves=get_possible_moves(player);
-  // 
-  //  int selected=rand()/(RAND_MAX + 1.0) * possible_moves.size();
-  //  Moves::const_iterator selected_iter=possible_moves.begin();
-  //  while (selected>0) {
-  //    selected--;
-  //    selected_iter++;
-  //  }
-  //  play_move(**selected_iter);
-  // 
-  //  //play_move(*selected);
-  //  //Move *selected=possible_moves[rand()%possible_moves.size()];
-  //  //play_move(*selected);
-  // 
-  //  for (Moves::iterator iter=possible_moves.begin(); iter!=possible_moves.end(); iter++) delete *iter;
-  // 
-  //  return true;
-  // } else {
-  //  //std::cout<<"board full"<<std::endl;
-  //  return false;
-  // }
+  std::srand((unsigned) std::time(0));
+  Moves m = this->get_possible_moves(player);
+  int idx = std::rand() % m.size();
+  Move *random_move;
+  
+  //Delete every move except the one we're going to make
+  int i=0;
+  for (std::list<Move *>::iterator itr = m.begin(); itr != m.end(); ++itr ) {
+    Move *move = (*itr);
+    
+    if(i == idx) {
+      random_move = move;
+    } else {
+      delete move;
+    }
+    i++;
+  }
+
+  this->play_move(*random_move);
+  delete random_move;
+  return this->check_for_win() == player;
 }
 
 Token BoardTanbo::check_for_win() const {
   if(this->roots.size() == 1) {
-    return roots[0].color;
+    return roots[0]->color;
   }
-  
-  // return nil unless @roots
-  // return @roots.first.color if @roots.size == 1
-  // winning_color = nil
-  // for root in @roots
-  //   if winning_color 
-  //     # There is no winner if we find a root with a different color than the
-  //     # first color
-  //     return nil if winning_color != root.color
-  //   else
-  //     # We haven't seen any colors yet. The first one we see is
-  //     # the potential winner
-  //     winning_color = root.color
-  //   end
-  // end
-  // # If we got here, every root in the array matches the color of the first root
-  // return winning_color
-  return NOT_PLAYED;
+  Token winning_color = NOT_PLAYED;
+  for (std::vector< boost::shared_ptr<RootTanbo> >::const_iterator itr = this->roots.begin(); itr != this->roots.end(); ++itr ) {
+    boost::shared_ptr<RootTanbo> root = (*itr);
+    if(winning_color != NOT_PLAYED) {
+      // There is no winner if we find a root with a different color than the
+      // first color
+      if(root->color != winning_color) {
+        return NOT_PLAYED;
+      }
+    } else {
+      //  We haven't seen any colors yet. The first one we see is
+      //  the potential winner
+      winning_color = root->color;
+    }
+  }
+  // If we got here, every root in the array matches the color of the first root
+  return winning_color;
 }
-

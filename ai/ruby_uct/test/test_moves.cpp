@@ -47,4 +47,6 @@ void MovesTest::test_move_effects() {
   CPPUNIT_ASSERT( gameboard->is_move_valid(*next_move, PLAYER_1) );
   next_move = gameboard->at(11, 11);
   CPPUNIT_ASSERT( gameboard->is_move_valid(*next_move, PLAYER_1) );
+  
+  gameboard->play_random_move(PLAYER_1);
 }

@@ -57,6 +57,6 @@ void PointTanbo::print() const {
 }
 
 boost::shared_ptr<PointTanbo> PointTanbo::deepcopy(boost::shared_ptr<BoardTanbo> board) {
-  assert(false);
-  return boost::make_shared<PointTanbo>(-1, -1, board);
+  boost::shared_ptr<PointTanbo> copy = boost::make_shared<PointTanbo>(this->x, this->y, board);
+  return copy;
 }

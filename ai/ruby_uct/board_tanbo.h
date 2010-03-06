@@ -67,7 +67,7 @@ public:
   // Instantiate and return a vector of the neighbors of the given Point
   boost::shared_ptr<  std::vector< boost::shared_ptr<PointTanbo> >  > BoardTanbo::bounded_neighbors(const PointTanbo &point);
 
-  boost::shared_ptr<PointTanbo> at(int x, int y);
+  boost::shared_ptr<PointTanbo> at(int x, int y) const;
 
   // These are the functions defined in the super class
   virtual Board *deepcopy() const;
@@ -82,7 +82,7 @@ public:
 
   // If the given point is adjacent to a single piece of the given color, return
   // that point. Otherwise, return null.
-  boost::shared_ptr<PointTanbo> get_adjacent_point(const PointTanbo &point, Token color);
+  boost::shared_ptr<PointTanbo> get_adjacent_point(const PointTanbo &point, Token color) const;
   // Find out if the move at a specified point is valid for a specified color. Uses
   // the color of whoever's turn it is if NOT_PLAYED is specified.
   bool is_move_valid(const PointTanbo &move, Token color=NOT_PLAYED);

@@ -21,6 +21,7 @@ require 'pathname'
 
 INTERFACE_NAME = 'ruby_uct'
 SRC = FileList['*.cpp']
+SRC.exclude('run_tanbo.cpp')
 SRC_HDRS = SRC.ext('h')
 TEST_SRC = FileList['test/test_*.cpp', 'test/*_fixture.cpp']
 TEST_HDRS = TEST_SRC.ext('h')
