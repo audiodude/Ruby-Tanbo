@@ -185,12 +185,16 @@ Board *BoardTanbo::deepcopy() const {
     }
   }
   
-  copy->roots = std::vector< boost::shared_ptr<RootTanbo> >(this->roots.size());
-  for (std::vector< boost::shared_ptr<RootTanbo> >::const_iterator itr = roots.begin(); itr != roots.end(); ++itr ) {
+  copy->roots = std::vector< boost::shared_ptr<RootTanbo> >();
+  for (std::vector< boost::shared_ptr<RootTanbo> >::const_iterator itr = this->roots.begin(); itr != this->roots.end(); ++itr ) {
     boost::shared_ptr<RootTanbo> root = (*itr);
     boost::shared_ptr<RootTanbo> root_copy = root->deepcopy(copy);
-    root_copy->print();
     copy->roots.push_back(root_copy);
+  }
+  
+  for (std::vector< boost::shared_ptr<RootTanbo> >::iterator itr = copy->roots.begin(); itr != copy->roots.end(); ++itr ) {
+    boost::shared_ptr<RootTanbo> root = (*itr);
+    assert(root);
   }
   
   return copy;
@@ -328,13 +332,15 @@ bool BoardTanbo::is_move_valid(const PointTanbo &point, Token color) {
 
 Moves BoardTanbo::get_possible_moves(Token player) const {
   Moves moves = Moves();
-  for (std::vector< boost::shared_ptr<RootTanbo> >::const_iterator itr = roots.begin(); itr != roots.end(); ++itr ) {
+  for (std::vector< boost::shared_ptr<RootTanbo> >::const_iterator itr = this->roots.begin(); itr != this->roots.end(); ++itr ) {
     boost::shared_ptr<RootTanbo> root = (*itr);
-    root->print();
+    assert(root);
     if(root->color != player) { continue; }
     for(std::list < boost::shared_ptr<PointTanbo> >::const_iterator itr2 = root->liberties.begin(); itr2 != root->liberties.end(); ++itr2) {
       boost::shared_ptr<PointTanbo> point = (*itr2);
+      assert(point);
       boost::shared_ptr<PointTanbo> adj = this->get_adjacent_point(*point, player);
+      assert(adj);
       MoveTanbo *next_move = new MoveTanbo(player, point->x, point->y, adj);
       moves.push_back(next_move);
     }
