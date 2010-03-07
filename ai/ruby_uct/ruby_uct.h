@@ -23,17 +23,35 @@
 #ifndef __UCT_PLAYER__
 #define __UCT_PLAYER__
 
-class Throttle {
+#include "board.h"
+#include "uct.h"
+#include "common.h"
+
+#include <string>
+
+class Player {
 public:
-  Throttle(int size);
-  
-  void shut_off() { position = 0; }
-  void shift(int amount);
-  
-  double flow() const { return position / double(top_position); }
-  bool is_on() const;
+	Player(const std::string &name,Token player);
+
+	Token get_player() const;
+	virtual int *get_move(const Board *board,const Move * last_move) =0;
+	virtual ~Player() {}
+
+protected:
+	std::string name;
+	Token player;
+};
+
+class PlayerBot : public Player {
+public:
+	PlayerBot(Token player,double max_sec=1.5,int max_iteration=0,double uct_constant=1.);
+
+	virtual int *get_move(const Board *board,const Move * last_move) ;
+	virtual ~PlayerBot();
+
 private:
-  int position;
-  int top_position;
+	double max_sec;
+	int max_iteration;
+	Node * root;
 };
 #endif

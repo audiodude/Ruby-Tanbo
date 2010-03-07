@@ -25,16 +25,30 @@
 #include "ruby_uct.h"
 %}
 
-class Throttle {
+class Player {
 public:
-  Throttle(int size);
+	Player(const std::string &name,Token player);
+
+	Token get_player() const;
+	virtual int *get_move(const Board *board,const Move * last_move) =0;
+	virtual ~Player() {}
+
+protected:
+	std::string name;
+	Token player;
+};
+
+class PlayerBot : public Player {
+public:
+	PlayerBot(Token player,double max_sec=1.5,int max_iteration=0,double uct_constant=1.);
+
+	virtual int *get_move(const Board *board,const Move * last_move) ;
+	virtual ~PlayerBot();
   
-  void shut_off();
-  void shift(int amount);
-  
-  double flow() const;
-  bool is_on() const;
+
+
 private:
-  int position;
-  int top_position;
+	double max_sec;
+	int max_iteration;
+	Node * root;
 };
